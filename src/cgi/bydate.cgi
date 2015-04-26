@@ -1,2 +1,2 @@
 #!/bin/sh
-( cd .. && ./html_index bydate )
+../../stocknotes/html_index bydate

@@ -1,2 +1,2 @@
 #!/bin/sh
-( cd .. && ./html_index byticker )
+../../stocknotes/html_index byticker
