@@ -4,15 +4,16 @@ import re
 import string
 import sys
 
-from date import Date
-import fraction
-from fraction import Fraction
-from price import dollar2str
-from price import Price
-from quotes import Quotes
-import shares as sharesm
-import stocks
-import trade
+print sys.path
+from lib.date import Date
+import lib.fraction as fraction
+from lib.fraction import Fraction
+from lib.price import dollar2str
+from lib.price import Price
+from lib.quotes import Quotes
+import lib.shares as sharesm
+import lib.stocks as stocks
+import lib.trade as trade
 
 # gain (year[:year]|commission) [ticker ticker ... ]
 

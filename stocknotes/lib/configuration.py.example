@@ -1,0 +1,2 @@
+LOG_DIR = "/home/robert/shared/stocks/log"
+NOTIFY_QUOTES_FILE = "/home/robert/shared/stocks/quotes_notify.csv"

@@ -1,5 +1,6 @@
 
 from date import Date
+from configuration import NOTIFY_QUOTES_FILE
 import re
 import string
 
@@ -10,17 +11,14 @@ dateRe = re.compile(r"^(?P<month>\d+)/(?P<day>\d+)/(?P<year>\d+)$")
 
 class Quotes:
 
-    def __init__(self,fname="quotes_notify.csv"):
+    def __init__(self):
 
         # we don't use the csv module since glottis uses an old version of
         # python that does not have the module
 
-        #if fname is None:
-        #    fname="quotes.csv"
-
         self.quotes = {}  # ticker ==> Quote
 
-        f=open(fname)
+        f=open(NOTIFY_QUOTES_FILE)
         while 1:
             line=f.readline()
             if line=="":

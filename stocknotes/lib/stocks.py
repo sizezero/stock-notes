@@ -12,6 +12,7 @@ import notify
 import shares
 from trade import parseTrade
 import buysell
+from configuration import LOG_DIR
 
 ################################################
 
@@ -71,17 +72,15 @@ keywordsRe = re.compile(r"^KEYWORDS:\s(?P<args>.*)$")
 keywordRe = re.compile(r"^[a-z][a-z0-9_]*$")
 
 def init():
-    srcDir = "log"
-
     fileRe = re.compile(r"^(?P<ticker>[A-Za-z\.\-]+)\.txt$")
-    files = os.listdir(srcDir)
+    files = os.listdir(LOG_DIR)
     files.sort()
     fail = 0
     for f in files:
         result = fileRe.search(f)
         if result:
             if not processFile(
-                os.path.join(srcDir,f),
+                os.path.join(LOG_DIR,f),
                 string.upper(result.group("ticker"))):
                 fail = 1
         else:
