@@ -1,2 +1,2 @@
 #!/bin/sh
-( cd .. && ./html_buysell )
+../../stocknotes/html_buysell
