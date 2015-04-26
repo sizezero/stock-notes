@@ -6,7 +6,7 @@ import string
 import sys
 
 import lib.stocks as stocks
-from lib.configuration import LOG_DIR
+from lib.configuration import LOG_DIR, NO_CIK_URL
 
 def main():
     optlist, args = getopt.getopt(sys.argv[1:], "n")
@@ -31,7 +31,7 @@ def main():
     if cid=="<none>":
         urls.append("http://sec.gov/edgar/searchedgar/companysearch.html")
         urls.append("'http://sec.gov/cgi-bin/browse-edgar?company=&CIK=%s&filenum=&State=&SIC=&owner=include&action=getcompany'" % ticker)
-        urls.append("file:///home/robert/shared/stocks/nocid.html")
+        urls.append(NO_CIK_URL)
     else:
         urls.append("'http://sec.gov/cgi-bin/browse-edgar?company=&CIK=%s&filenum=&State=&SIC=&owner=include&action=getcompany'" % cid)
         
