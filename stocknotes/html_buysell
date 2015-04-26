@@ -4,12 +4,13 @@ import cgi
 import string
 import sys
 
-import date
-import fraction
-import price
-from price import Price
-from quotes import Quotes
-import stocks
+import lib.date as date
+import lib.fraction as fraction
+import lib.price as price
+from lib.price import Price
+from lib.quotes import Quotes
+import lib.stocks as stocks
+from lib.configuration import BUY_SELL_QUOTES_FILE
 
 # c'mon Guido, give us C's ternary operator
 IF = lambda a,b,c:(a and [b] or [c])[0]
@@ -17,7 +18,7 @@ IF = lambda a,b,c:(a and [b] or [c])[0]
 def main():
     print "Content-type: text/html\n"
 
-    quotes = Quotes("quotes_buysell.csv")
+    quotes = Quotes(BUY_SELL_QUOTES_FILE)
 
     cos = []
     for c in stocks.companies.values():

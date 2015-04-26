@@ -1,5 +1,7 @@
 #!/usr/bin/python
 
+# TODO I'm not sure if this is used anymore (or if it ever was)
+
 import getopt
 import sys
 

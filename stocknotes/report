@@ -3,7 +3,9 @@
 import string
 import sys
 
-import stocks
+import lib.stocks as stocks
+
+# TODO: seems kind of useless now that we have unit tests; consider removing
 
 def main():
 

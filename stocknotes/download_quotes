@@ -5,8 +5,9 @@ import os
 import string
 import sys
 
-import stocks
-import trade
+import lib.stocks as stocks
+import lib.trade as trade
+import lib.configuration as configuration
 
 """
 s=tick1+tick2
@@ -21,6 +22,7 @@ def main():
     
     tickers=[]
     if quote_type=="notify":
+        target_fname = configuration.NOTIFY_QUOTES_FILE
         for c in stocks.companies.values():
             # find all companies that have ever been bought, or companies
             # that need the price for notification
@@ -28,15 +30,15 @@ def main():
                     or reduce(lambda r,n: r or n.needsPrice(), c.notifies, 0):
                 tickers.append(c.ticker)
     else:
+        target_fname = configuration.BUY_SELL_QUOTES_FILE
         for c in stocks.companies.values():
             if c.buy or c.sell:
                 tickers.append(c.ticker)
 
-    target_fname = "quotes_"+quote_type+".csv"
-    cmd = "wget -O new_quotes.csv 'http://finance.yahoo.com/d/quotes.csv?s=%s&f=sl1d1t1c1ohgv&e=.csv'" % string.join(tickers,"+")
-    doCmd(cmd,1)
-    doCmd("rm "+target_fname,0)
-    doCmd("mv new_quotes.csv "+target_fname,1)
+    cmd = "wget -O %s 'http://finance.yahoo.com/d/quotes.csv?s=%s&f=sl1d1t1c1ohgv&e=.csv'" % (configuration.TEMP_FILE, string.join(tickers,"+"))
+    doCmd(cmd, 1)
+    doCmd("rm "+target_fname, 0)
+    doCmd("mv %s %s" % (configuration.TEMP_FILE, target_fname), 1)
 
 def getArgs():
     if len(sys.argv)==1:

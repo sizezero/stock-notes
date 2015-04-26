@@ -1,6 +1,6 @@
 #!/usr/bin/python
 
-import stocks
+import lib.stocks as stocks
 
 def main():
 

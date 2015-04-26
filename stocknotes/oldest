@@ -3,7 +3,7 @@
 import getopt
 import sys
 
-import stocks
+import lib.stocks as stocks
 
 def main():
 

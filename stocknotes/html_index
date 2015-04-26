@@ -4,7 +4,7 @@ import cgi
 import string
 import sys
 
-import stocks
+import lib.stocks as stocks
 
 def main():
     
