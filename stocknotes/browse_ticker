@@ -5,7 +5,8 @@ import os
 import string
 import sys
 
-import stocks
+import lib.stocks as stocks
+from lib.configuration import LOG_DIR
 
 def main():
     optlist, args = getopt.getopt(sys.argv[1:], "n")
@@ -36,10 +37,10 @@ def main():
         
     browseUrls(urls)
     if not noEdit:
-        os.popen("gedit log/%s.txt &" % string.lower(ticker)).close()
+        os.popen("gedit %s/%s.txt &" % (LOG_DIR, string.lower(ticker))).close()
 
 def browseUrls(urls):
-    cmd = "./open_as_chrome_tabs "+string.join(urls)+" &"
+    cmd = "open_as_chrome_tabs "+string.join(urls)+" &"
     input = os.popen(cmd)
     out = input.read()
     ret = input.close()
