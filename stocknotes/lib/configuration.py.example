@@ -1,2 +1,7 @@
-LOG_DIR = "/home/robert/shared/stocks/log"
-NOTIFY_QUOTES_FILE = "/home/robert/shared/stocks/quotes_notify.csv"
+_shared = "/home/robert/shared/stocks"
+_project = "/home/robert/stock-notes"
+LOG_DIR = "%s/log" % _shared
+NOTIFY_QUOTES_FILE = "%s/download/quotes_notify.csv" % _shared
+BUY_SELL_QUOTES_FILE = "%s/download/quotes_buysell.csv" % _shared
+TEMP_FILE = "%s/download/temp" % _shared
+NO_CIK_URL = "file://%s/src/res/nocik.html" % _project
