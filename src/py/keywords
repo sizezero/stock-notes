@@ -1,0 +1,40 @@
+#!/usr/bin/python
+
+import getopt
+import string
+import sys
+
+import stocks
+
+def main():
+
+    optlist, args = getopt.getopt(sys.argv[1:], "v")
+    opts = {}
+    for (opt,val) in optlist:
+        opts[opt] = val
+    verbose = opts.has_key("-v")
+
+    keywords = {} # keyword ==> [ tickers ]
+    
+    for c in stocks.companies.values():
+    	for k in c.keywords:
+	    if keywords.has_key(k):
+                keywords[k].append(c.ticker)
+	    else:
+		keywords[k] = [c.ticker]
+
+    if verbose:
+        tmp = keywords.keys()
+        tmp.sort()
+	for k in tmp:
+            tmp2 = keywords[k]
+            tmp2.sort()
+	    print k+": "+string.join(tmp2,",")
+    else:
+        tmp = keywords.keys()
+        tmp.sort()
+	for k in tmp:
+	    print k
+
+main()
+

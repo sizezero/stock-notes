@@ -1,0 +1,43 @@
+#!/usr/bin/python
+
+import string
+import sys
+
+import stocks
+
+def main():
+
+    tickers = map(string.upper,sys.argv[1:])
+    
+    if len(tickers)==0:
+        print "report ticker1 ticker2 ticker3 ..."
+        sys.exit(1)
+
+    # verify tickers
+    invalidTicker=0
+    for t in tickers:
+        if not stocks.companies.has_key(t):
+            print "invalid ticker: "+t
+            invalidTicker=1
+        
+    if invalidTicker==1:
+        sys.exit(1)
+
+    for t in tickers:
+        print
+        print "======================================"
+        print t
+        print stocks.companies[t].name
+        
+        entries = stocks.companies[t].entries
+        entries.sort()
+        entries.reverse()
+        
+        for e in entries:
+            print
+            print e.date
+            print
+            print e.text
+
+main()
+

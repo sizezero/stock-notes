@@ -1,0 +1,26 @@
+#!/usr/bin/python
+
+import stocks
+
+def main():
+
+    entries = {} # (date,ticker) ==> emtries
+    for e in stocks.entries:
+        entries[(e.date,e.ticker)] = e
+        
+    tups = entries.keys()
+    tups.sort()
+    tups.reverse()
+
+    for tup in tups:
+        e = entries[tup]
+        print "%s %s %s" % \
+            (e.date,
+             e.ticker,
+             stocks.companies[e.ticker].name)
+        print
+        print e.text
+        print
+
+main()
+

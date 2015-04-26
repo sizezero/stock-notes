@@ -1,0 +1,103 @@
+#!/usr/bin/python
+
+import cgi
+import string
+import sys
+
+import date
+import fraction
+import price
+from price import Price
+from quotes import Quotes
+import stocks
+
+# c'mon Guido, give us C's ternary operator
+IF = lambda a,b,c:(a and [b] or [c])[0]
+
+def main():
+    print "Content-type: text/html\n"
+
+    quotes = Quotes("quotes_buysell.csv")
+
+    cos = []
+    for c in stocks.companies.values():
+        if c.buy or c.sell:
+            cos.append(c)
+
+    form = cgi.FieldStorage()
+    reverse = form.has_key("reverse") and form["reverse"].value=="1"
+    bydate = form.has_key("order") and form["order"].value=="bydate"
+    if (bydate):
+        cos.sort(None,lambda c: c.entries[-1].date,reverse)
+    else:
+        cos.sort(None,lambda c: c.ticker,reverse)
+
+    print "<table border=1>"
+    print "<tr>"
+    print "<td><a href=\"buysell.cgi?reverse="+IF(reverse, "0", "1")+"\">ticker</a></td>"
+    print "<td>quote</td><td>buy</td><td>buy</td><td>sell</td><td>sell</td>"
+    print "<td><a href=\"buysell.cgi?order=bydate&reverse="+IF(reverse,"0","1")+"\">last note</td></tr>"
+
+    for c in cos:
+        print '<tr><td><a href="http://finance.yahoo.com/q?s=%s">%s</a></td>' % \
+            (string.lower(cgi.escape(c.ticker)),
+             cgi.escape(c.ticker))
+        #print "<tr><td>"+c.ticker+"</td><td>"
+        td('b')
+        if quotes.has_key(c.ticker):
+            print quotes[c.ticker].price
+        print "</font></td>"
+        if c.buy:
+            if quotes.has_key(c.ticker) and quotes[c.ticker].price < c.buy.price1:
+                td('g')
+            else:
+                td()
+            print c.buy.price1
+            if c.buy.price2:
+                if quotes.has_key(c.ticker) and quotes[c.ticker].price < c.buy.price2:
+                    td('g')
+                else:
+                    td()
+                print c.buy.price2
+            else:
+                td()
+        else:
+            td()
+            td()
+        print "</font></td>"
+        if c.sell:
+            if c.sell.price2:
+                if quotes.has_key(c.ticker) and quotes[c.ticker].price > c.sell.price2:
+                    td('r')
+                else:
+                    td()
+                print c.sell.price2
+            else:
+                td()
+            if quotes.has_key(c.ticker) and quotes[c.ticker].price > c.sell.price1:
+                td('r')
+            else:
+                td()
+            print c.sell.price1
+        else:
+            td()
+            td()
+        print "</font></td>"
+        print '<td><a href="log.cgi?ticker=%s">%s</a></td>' % \
+            (string.lower(cgi.escape(c.ticker)),
+             c.entries[-1].date)
+        print "</tr>"
+
+    print "</table>"
+
+def td(loud=None):
+    if loud=='r':
+        print "<td bgcolor=\"#8B0000\"><font color=\"#FFFFFF\">"
+    elif loud=='g':
+        print "<td bgcolor=\"#347235\"><font color=\"#FFFFFF\">"
+    elif loud=='b':
+        print "<td bgcolor=\"#BDEDFF\"><font>"
+    else:
+        print "<td><font>"
+        
+main()

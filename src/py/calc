@@ -1,0 +1,370 @@
+#!/usr/bin/python
+
+import re
+import string
+import sys
+
+"""
+
+write a script to handle earnings calculations
+numbers: quarter earnings, revenues, shares outstanding, price, eps, PE, mc
+we can have multiple: earnings, shares, price, eps, PE, MC
+earnings: just average
+shares: don't calc, can be multiple
+price: don't calc, can be multiple
+eps: always calc (need 1, 2, or 4 quarters) may be multiple
+mc: if given produces price, otherwise shares x price
+PE: if given produces price and mc, otherwise mc x eps
+
+basics:
+
+delimiter: ( |:|=)
+
+dollar:
+
+possible Input
+
+rev: dollar (dollar...)
+
+earnings:
+inc: dollar (dollar...)
+eps:
+
+PE:
+PE dollar
+PE @price dollar
+
+shares:
+shares [outstanding] num
+shares [outstanding]  num diluted num
+
+eps:
+eps dollar
+
+market cap:
+MC dollar
+
+price dollar
+
+div:
+div dollar
+
+output:
+
+earnings, shares ==> eps
+
+price, eps ==> PE
+
+eps, shares ==> MC
+
+input(MC) ==> price, PE
+?PE ==> price, MC
+?price ==> PE, MC
+
+revenue, earnings ==> margins
+
+div, price ==> yield
+div, eps ==> payout ratio
+
+Really there is input and calculated.  The union of these is
+available.  We don't want to have multiple values.  Leave this for
+multiple searches.  If normal shares and diluted shares are shown,
+then diluted is chosen.
+
+Calc order is:
+eps
+PE
+MC
+price
+shares
+yield
+payout ratio
+
+sets of conflicting inputs are:
+(earnings, eps)
+(price,eps,PE)
+(shares,price,MC)
+
+"""
+
+def main():
+    lookup=[
+        ("Income",re.compile(r"^inc(ome)?$"),parseIncome,genIncome,dispIncome),
+        ("Revenue",re.compile(r"^rev(enue)?$"),parseRevenue,genRevenue,dispRevenue),
+        ("EPS",re.compile(r"^eps$"),      parseEps,genEps,dispEps),
+        ("PE",re.compile(r"^pe$"),       parsePe,genPe,dispPe),
+        ("MC",re.compile(r"^mc$"),       parseMc,genMc,dispMc),
+        ("Price",re.compile(r"^price$"),    parsePrice,genPrice,dispPrice),
+        ("Shares",re.compile(r"^shares$"),   parseShares,genShares,dispShares),
+        ("Margins",re.compile(r"^margins$"),   parseMargins,genMargins,dispMargins),
+        ("Dividend",re.compile(r"^div$"),   parseDiv,genDiv,dispDiv),
+        ("Yield",re.compile(r"^yield$"),   parseYield,genYield,dispYield),
+        ("Payout Ratio",re.compile(r"^payout$"),   parsePayout,genPayout,dispPayout),
+        ]
+    # ignore space or right arrow ==>
+    reIgnore=re.compile(r"^(\s*|=+>)$")
+    reSplit=re.compile(r"[\s:=]+")
+    inputDict={}
+    generatedDict={}
+    while 1:
+        line=sys.stdin.readline()
+        if len(line)==0:
+            break
+        if reIgnore.search(line):
+            continue
+        # trailing newline screws up re.split
+        a=reSplit.split(line.strip())
+        matched=0
+        for (keyword,regex,pd,gs,ds) in lookup:
+            keyword = keyword.lower()
+            if regex.search(a[0].lower()):
+                try:
+                    val=pd(a[1:])
+                    if inputDict.has_key(keyword):
+                        raise ValueError(keyword+" specified twice")
+                    inputDict[keyword]=val
+                    matched=1
+                except ValueError,ve:
+                    error(str(ve),line)
+                break
+        if not matched:
+            error("unmatched line",line)
+    conflicts = [
+        ("income","eps"),
+        ("srice","eps","pe"),
+        ("shares","price","mc")]
+    for c in conflicts:
+        missing=0
+        for keyword in c:
+            if not inputDict.has_key(keyword):
+                missing=1
+                break
+        if not missing:
+            error("keyword conflict: "+string.join(c))
+    while 1:
+        startingLen=len(inputDict)
+        for (keyword,regex,pd,gs,ds) in lookup:
+            keyword = keyword.lower()
+            if not inputDict.has_key(keyword):
+                val=gs(inputDict)
+                if val is not None:
+                    inputDict[keyword]=val
+                    break
+        if len(inputDict)==startingLen:
+            break
+    for (title,regex,pd,gs,ds) in lookup:
+        keyword = title.lower()
+        if inputDict.has_key(keyword):
+            print title,ds(inputDict[keyword])
+
+def error(s,line=""):
+    print "Error: "+s
+    if line!="":
+        print line
+    sys.exit(1)
+        
+def checkLen(a,length):
+    if len(a)!=length:
+        raise ValueError("expected %d args, got %d" % (length,len(a)))
+
+def parseIncome(a):
+    if len(a)>4:
+        raise ValueError("income cannot have more than 4 quarters")
+    sum=0.0
+    for s in a:
+        sum += parseDollar(s,1000)
+    return sum * (4.0/len(a))
+
+def parseRevenue(a):
+    if len(a)>4:
+        raise ValueError("revenue cannot have more than 4 quarters")
+    sum=0.0
+    for s in a:
+        sum += parseDollar(s,1000)
+    return sum * (4.0/len(a))
+
+def parseEps(a):
+    checkLen(a,1)
+    return parseDollar(a[0],1)
+
+def parsePe(a):
+    checkLen(a,1)
+    return parseDollar(a[0],1)
+
+def parseMc(a):
+    checkLen(a,1)
+    return parseNumber(a[0],1000000)
+
+def parsePrice(a):
+    return parseEps(a)
+
+def parseShares(a):
+    ln=len(a)
+    if not (ln==1 or (ln==2 and a[1]=="(diluted)")):
+        raise ValueError("wrong share args")
+    return parseNumber(a[0],1)
+
+def parseMargins(a):
+    raise ValueError("margins not allowd as input")
+    
+def parseDiv(a):
+    checkLen(a,1)
+    return parseDollar(a[0],1)
+
+def parseYield(a):
+    raise ValueError("yield not allowd as input")
+    
+def parsePayout(a):
+    raise ValueError("payout not allowd as input")
+    
+def parseDollar(s,mult):
+    s=string.strip(s)
+    sign=1
+    if len(s)>=2 and s.startswith('(') and s.endswith(')'):
+        sign=-1
+        s=s[1:len(s)-1]
+    if s.endswith("k") or s.endswith("K"):
+        s=s[0:len(s)-1]
+        mult=1000
+    elif s.endswith("m") or s.endswith("M"):
+        s=s[0:len(s)-1]
+        mult=1000000
+    s=s.replace(",","")
+    s=s.replace("$","")
+    try:
+        d=float(s)
+        return sign*d*mult
+    except Exception:
+        raise ValueError("can't parse dollar amount")
+
+def parseNumber(s,mult):
+    s=string.strip(s)
+    sign=1
+    if len(s)>=2 and s.startswith('(') and s.endswith(')'):
+        sign=-1
+        s=s[1:len(s)-1]
+    if s.endswith("k") or s.endswith("K"):
+        s=s[0:len(s)-1]
+        mult=1000
+    elif s.endswith("m") or s.endswith("M"):
+        s=s[0:len(s)-1]
+        mult=1000000
+    s=s.replace(",","")
+    try:
+        d=int(s)
+        return sign*d*mult
+    except Exception:
+        raise ValueError("can't parse number")
+
+def genIncome(d):
+    return None
+
+def genRevenue(d):
+    return None
+
+def genEps(d):
+    if d.has_key("income") and d.has_key("shares"):
+        return d["income"] / d["shares"]
+    else:
+        return None
+
+def genPe(d):
+    if d.has_key("price") and d.has_key("eps"):
+        return d["price"] / d["eps"]
+    elif d.has_key("mc") and d.has_key("income"):
+        return d["mc"] / d["income"]
+    else:
+        return None
+
+def genMc(d):
+    if d.has_key("price") and d.has_key("shares"):
+        return d["price"] * d["shares"]
+    else:
+        return None
+
+def genPrice(d):
+    if d.has_key("shares") and d.has_key("mc"):
+        return d["mc"] / d["shares"]
+    elif d.has_key("pe") and d.has_key("eps"):
+        return d["pe"] * d["eps"]
+    else:
+        return None
+
+def genShares(d):
+    return None
+
+def genMargins(d):
+    if d.has_key("income") and d.has_key("revenue"):
+        i=d["income"]
+        r=d["revenue"]
+        if i<0.0 or r<0.0:
+            return "N/A"
+        return pcnt2str(i/r)
+
+def genDiv(d):
+    return None
+
+def genYield(d):
+    if d.has_key("price") and d.has_key("dividend"):
+        return pcnt2str( d["dividend"] / d["price"] )
+    else:
+        return None
+
+def genPayout(d):
+    if d.has_key("eps") and d.has_key("dividend") and d["eps"]>0.0:
+        return pcnt2str( d["dividend"] / d["eps"] )
+    else:
+        return None
+
+def signParen(s,val):
+    if val<0:
+        return "("+s+")"
+    else:
+        return s
+
+def pcnt2str(f):
+    return "%.1f%%" % (f*100.0)
+
+def dispIncome(val):
+    return signParen("$%.1fM" % abs(val/1000000.0),val)
+
+def dispRevenue(val):
+    return signParen("$%.1fM" % abs(val/1000000.0),val)
+
+def dispEps(val):
+    return signParen("$%.2f" % abs(val),val)
+
+def dispPe(val):
+    if val>0:
+        return "%.1f" % val
+    else:
+        return "N/A"
+
+def dispMc(val):
+    if val<0:
+        return "WTF!?!?! negative market cap!!!"
+    else:
+        return "$%.1fM" % (val/1000000)
+
+def dispPrice(val):
+    return dispEps(val)
+
+def dispShares(val):
+    if val<0:
+        return "WTF!?!?! negative shares!!!"
+    else:
+        return "%.1fM" % (val/1000000.0)
+
+def dispMargins(val):
+    return val
+
+def dispDiv(val):
+    return signParen("$%.2f" % abs(val),val)
+
+def dispYield(val):
+    return val
+
+def dispPayout(val):
+    return val
+
+main()

@@ -1,0 +1,47 @@
+#!/usr/bin/python
+
+import getopt
+import os
+import string
+import sys
+
+import stocks
+
+def main():
+    optlist, args = getopt.getopt(sys.argv[1:], "n")
+    opts = {}
+    for (opt,val) in optlist:
+        opts[opt] = val
+    noEdit = opts.has_key("-n")
+    if len(args) != 1:
+        print "usage: browseticker [-n] ticker"
+        sys.exit(1)
+    ticker = string.upper(args[0])
+
+    yahoo = "http://finance.yahoo.com/q/%s?s=%s%s"
+    urls = []
+    for type1,type2 in (("pr",""),("is","\\&annual"),("is",""),("h",""),("bc",""),("ae","")):
+        urls.append(yahoo % (type1,ticker,type2))
+
+    if stocks.companies.has_key(ticker):
+        cid = stocks.companies[ticker].cid
+    else:
+        cid="<none>"
+    if cid=="<none>":
+        urls.append("http://sec.gov/edgar/searchedgar/companysearch.html")
+        urls.append("'http://sec.gov/cgi-bin/browse-edgar?company=&CIK=%s&filenum=&State=&SIC=&owner=include&action=getcompany'" % ticker)
+        urls.append("file:///home/robert/shared/stocks/nocid.html")
+    else:
+        urls.append("'http://sec.gov/cgi-bin/browse-edgar?company=&CIK=%s&filenum=&State=&SIC=&owner=include&action=getcompany'" % cid)
+        
+    browseUrls(urls)
+    if not noEdit:
+        os.popen("gedit log/%s.txt &" % string.lower(ticker)).close()
+
+def browseUrls(urls):
+    cmd = "./open_as_chrome_tabs "+string.join(urls)+" &"
+    input = os.popen(cmd)
+    out = input.read()
+    ret = input.close()
+
+main()

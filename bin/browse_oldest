@@ -1,0 +1,21 @@
+#!/bin/bash
+
+KEYWORD=""
+
+while getopts ":k:" opt; do
+  case $opt in
+    k)
+      KEYWORD="-k $OPTARG"
+      ;;
+    \?)
+      echo "Invalid option: -$OPTARG" >&2
+      exit 1
+      ;;
+    :)
+      echo "Option -$OPTARG requires an argument." >&2
+      exit 1
+      ;;
+  esac
+done
+
+./browse_ticker $(./oldest -t $KEYWORD | head -n 1)

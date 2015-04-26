@@ -1,0 +1,21 @@
+#!/bin/bash
+
+if [ $# == 0 ]; then
+    echo "usage: open_as_chrome_tabs URL [ URL ... ]"
+    exit 1
+fi
+
+first=0
+cl=""
+for url in $@
+do
+  if [ $first == 0 ]; then
+      chromium-browser &
+      sleep 5
+      first=1
+  else
+      sleep 2
+  fi
+  chromium-browser $url &
+done
+

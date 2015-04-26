@@ -1,0 +1,36 @@
+#!/usr/bin/python
+
+import getopt
+import sys
+
+import date
+import fraction
+from price import Price
+from quotes import Quotes
+import stocks
+
+def main():
+    (pairs,args) = getopt.getopt(sys.argv[1:],"",["all","email=","date="])
+    lookup = dict(pairs)
+
+    nullPrice = Price(1.0,fraction.one)
+    quotes = Quotes()
+
+    for c in stocks.companies.values():
+        mult = fraction.one
+        for r in c.trades:
+            mult=r.multAdjust(mult)
+        if quotes.has_key(c.ticker):
+            price = Price(quotes[c.ticker].price,mult)
+        else:
+            price = nullPrice
+        for n in c.notifies:
+            if lookup.has_key("--all") or n.isTriggered(price,date.today):
+                s = n.lineItem(c,mult)
+                if s != "":
+                    if lookup.has_key("--email"):
+                        n.email(c,mult,lookup["--email"])
+                    else:
+                        print s
+
+main()

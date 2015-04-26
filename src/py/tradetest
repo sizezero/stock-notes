@@ -1,0 +1,12 @@
+#!/usr/bin/python
+
+import stocks
+
+def main():
+    for c in stocks.companies.values():
+        if len(c.trades)>0:
+            print c.ticker
+            for t in c.trades:
+                print " ",t
+
+main()

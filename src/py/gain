@@ -1,0 +1,277 @@
+#!/usr/bin/python
+
+import re
+import string
+import sys
+
+from date import Date
+import fraction
+from fraction import Fraction
+from price import dollar2str
+from price import Price
+from quotes import Quotes
+import shares as sharesm
+import stocks
+import trade
+
+# gain (year[:year]|commission) [ticker ticker ... ]
+
+# commission assumes gain on an immediate sale of all securites at the
+# market price in quotes.csv
+
+# output format is as follows
+
+"""
+ticker
+
+sell shares@price $1234.56 commission $123.23
+cost:
+ 200@4.3 $234 commission $123.12
+ 300@5.9 $212 commission $123.12
+net $12345.12
+capital gain $1234.56
+yield 10.1%
+dividend yield 11.1%
+
+cumulative capital gain $12345.67
+cumulative yield $123
+cumulative dividend yield $123
+
+"""
+
+colWidth = "13"
+itemFmt = "%"+colWidth+"s%"+colWidth+"s%"+colWidth+"s%"+colWidth+"s%"+colWidth+"s%"+colWidth+"s%"+colWidth+"s"
+
+def main():
+
+    (start,end,commission,tickers)=getArgs()
+
+    # start looping through the tickers, print sells if they come up
+    # in the given date range
+
+    quotes = Quotes()
+    companies=[]
+    for t in tickers:
+        c = stocks.companies[t]
+        if len(c.trades)==0:
+            continue
+
+        if commission < 0.0:
+            isAtLeastOneSell=0
+            for s in c.trades:
+                if s.isSell() and s.date>=start and s.date<=end:
+                    isAtLeastOneSell=1
+                    break
+            if not isAtLeastOneSell:
+                continue
+            
+        headerPrinted=0
+        c.value = 0.0
+        c.capitalGains = 0.0
+        c.gross = 0.0
+        c.ltcg = 0.0
+        
+        # do all calculations based on the current mult
+        mult = fraction.one
+        for r in c.trades:
+            mult=r.multAdjust(mult)
+            
+        balance = sharesm.zero
+        hasSellLineItem=0
+        for r in c.trades:
+            balance=r.shareAdjust(balance)
+            if r.isBuy():
+                r.unsoldShares = r.shares
+            elif r.isSell():
+                matchBuysToSells(r,c.trades,mult)
+                # possibly display sale data
+                if commission < 0.0 and r.date>=start and r.date<=end:
+                    if not headerPrinted:
+                        print t
+                        print
+                        headerPrinted=1
+                    printSell(r,mult)
+                    c.value += r.value
+                    c.capitalGains += r.capitalGain
+                    c.gross += r.gross
+                    c.ltcg += r.ltcg
+                    hasSellLineItem=1
+
+        if commission > 0.0 and balance!=sharesm.zero:
+            # add a mock sale if there is a positive balance
+            if not quotes.has_key(t):
+                print "!!! no quote !!!"
+            else:
+                if not headerPrinted:
+                    print t
+                    print
+                    headerPrinted=1
+                q = quotes[t]
+                sell = trade.Sell(q.date,balance,Price(q.price,mult),commission)
+                matchBuysToSells(sell,c.trades,mult)
+                printSell(sell,mult)
+                #c.net += sell.net
+                c.capitalGains += sell.capitalGain
+                c.value += sell.value
+                c.gross += sell.gross
+                c.ltcg += sell.ltcg
+                hasSellLineItem=1
+
+        if not hasSellLineItem:
+            continue
+        companies.append(c)
+
+    print "Summary"
+    fmt="%10s%15s%5s%15s%15s"
+    print fmt % ("ticker","value","%","cap gains","ltcg")
+    cumValue = 0.0
+    cumCapitalGains = 0.0
+    for c in companies:
+        cumValue += c.value
+        cumCapitalGains += c.capitalGains
+    for c in companies:
+        if c.gross>0.1:
+            ltcgPcnt = c.ltcg/c.gross
+        else:
+            ltcgPcnt = 0.0
+        print fmt % (c.ticker, dollar2str(c.value), pcnt2str(c.value/cumValue), dollar2str(c.capitalGains),pcnt2str(ltcgPcnt))
+    print "=" * 50
+    print fmt % ("",dollar2str(cumValue),"100%",dollar2str(cumCapitalGains),"")
+    print
+
+def getArgs():
+    a = sys.argv[1:]
+    if len(a)<1:
+        # default sell all with a commission of 30
+        a = ["30"]
+    commission = -100.0
+    if a[0]==":":
+        start=Date(1900,1,1)
+        end  =Date(2100,1,1)
+    elif re.compile(r"^\d{4}$").search(a[0]):
+        year=int(a[0])
+        start=Date(year,1,1)
+        end  =Date(year,12,31)
+    else:
+        result = re.compile(r"^(?P<y1>\d{4}):(?P<y2>\d{4})$").search(a[0])
+        if result:
+            start=Date(int(result.group("y1")),1,1)
+            end  =Date(int(result.group("y2")),12,31)
+        elif re.compile(r"^\d+(\.\d+)?$").search(a[0]):
+            commission = float(a[0])
+            start=Date(1900,1,1)
+            end=start
+        else:
+            usage()
+
+    a.pop(0)
+    if len(a)==0:
+        tickers=stocks.companies.keys()
+        tickers.sort()
+    else:
+        tickers=map(string.upper,a)
+        for t in tickers:
+            if not stocks.companies.has_key(t):
+                print "unknown ticker "+t
+                sys.exit(1)
+                
+    return (start,end,commission,tickers)
+
+def usage():
+    print "gain (year[:year] | commission) [ticker ticker ... ]"
+    sys.exit(1)
+
+class Transaction:
+    pass
+
+def totalYield(start,end):
+    return end/start - 1.0
+
+def annualYield(start,end,decimalYears):
+    # don't explode if a purchase was made today
+    if end==start or decimalYears==0.0 or start==0.0:
+        return 0.0
+    else:
+        return (end/start)**(1/decimalYears) - 1.0
+
+def matchBuysToSells(sell,trades,mult):
+    # match up the sale with earlier buys
+    sell.transactions=[]
+    sell.gross = sell.shares.atMult(mult)*sell.price.atMult(mult)
+    #sell.net = sell.gross
+    sell.cost=0.0
+    sell.totalCommission=0.0
+    sell.ltcg=0.0
+    
+    remaining = sell.shares
+    for buy in trades:
+        if remaining==sharesm.zero:
+            break
+        if buy.isBuy() and buy.unsoldShares!=sharesm.zero:
+            t=Transaction()
+            t.buy=buy
+            if remaining==buy.unsoldShares:
+                t.shares=remaining
+                remaining=sharesm.zero
+                buy.unsoldShares = sharesm.zero
+            elif remaining>buy.unsoldShares:
+                t.shares=buy.unsoldShares
+                remaining = remaining - buy.unsoldShares
+                buy.unsoldShares = sharesm.zero
+            else:
+                t.shares=remaining
+                buy.unsoldShares = buy.unsoldShares-remaining
+                remaining=sharesm.zero
+            t.buyCommission=buy.commission*(t.shares/buy.shares)
+            t.sellCommission=sell.commission*(t.shares/sell.shares)
+            t.commission=t.buyCommission+t.sellCommission
+            t.cost=t.shares.atMult(mult)*t.buy.price.atMult(mult)
+            t.net=t.shares.atMult(mult)*sell.price.atMult(mult)
+            t.annualYield=annualYield(t.cost,t.net,sell.date.decimalYear()-buy.date.decimalYear())
+            t.ltcg = sell.date.decimalYear()-buy.date.decimalYear()>1.0
+            if t.ltcg:
+                sell.ltcg += t.net
+            sell.transactions.append(t)
+            sell.cost += t.cost
+            sell.totalCommission += t.commission
+    #sell.net = sell.gross-sell.totalCommission
+    #sell.capitalGain = sell.gross-sell.cost
+    sell.value = sell.gross-sell.commission
+    sell.capitalGain = sell.gross-sell.cost-sell.totalCommission
+
+def pcnt2str(f):
+    return "%.1f%%" % (f*100.0)
+
+def sharesAtPrice2str(shares,price,mult):
+    return "%d@%.2f" % (shares.atMult(mult),price.atMult(mult))
+
+def printSell(sell,mult):
+    print "%s sell %d@%.2f $%.2f commission $%.2f" % (str(sell.date),sell.shares.atMult(mult),sell.price.atMult(mult),sell.gross,sell.commission)
+    print itemFmt % ("purchase date","","share@price","cost","buy fee","sell fee","annual yield")
+    for t in sell.transactions:
+        print itemFmt % (
+            t.buy.date.abbreviated(),
+            "(ltcg)" if t.ltcg else "",
+            sharesAtPrice2str(t.shares,t.buy.price,mult),
+            dollar2str(t.cost),
+            dollar2str(t.buyCommission),
+            dollar2str(t.sellCommission),
+            pcnt2str(t.annualYield))
+    if (sell.cost < 0.01):
+        # TODO: this is wrong
+        avgPurchasePrice = Price(0.0,fraction.one)
+    else:
+        avgPurchasePrice = Price(sell.cost/sell.shares.atMult(mult),mult)
+    print itemFmt % (
+        "",
+        "=",
+        sharesAtPrice2str(sell.shares,avgPurchasePrice,mult),
+        dollar2str(sell.cost),
+        dollar2str(sell.totalCommission - sell.commission),
+        dollar2str(sell.commission),
+        "???")
+    print "cap gain %s" % \
+          (dollar2str(sell.capitalGain),)
+    print
+
+main()
