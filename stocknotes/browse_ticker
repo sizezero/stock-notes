@@ -24,6 +24,8 @@ def main():
     for type1,type2 in (("pr",""),("is","\\&annual"),("is",""),("h",""),("bc",""),("ae","")):
         urls.append(yahoo % (type1,ticker,type2))
 
+    urls.append("http://www.morningstar.com/content/morningstarcom/en_us/stocks/xnas/%s/quote.html" % (ticker,))
+
     if stocks.companies.has_key(ticker):
         cid = stocks.companies[ticker].cid
     else:
