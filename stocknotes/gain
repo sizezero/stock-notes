@@ -44,7 +44,7 @@ itemFmt = "%"+colWidth+"s%"+colWidth+"s%"+colWidth+"s%"+colWidth+"s%"+colWidth+"
 
 def main():
 
-    (start,end,commission,tickers)=getArgs()
+    (start,end,commission,tickers,omit)=getArgs()
 
     # start looping through the tickers, print sells if they come up
     # in the given date range
@@ -54,6 +54,9 @@ def main():
     for t in tickers:
         c = stocks.companies[t]
         if len(c.trades)==0:
+            continue
+
+        if (omit in c.keywords):
             continue
 
         if commission < 0.0:
@@ -140,7 +143,15 @@ def main():
     print
 
 def getArgs():
+    # TODO replace with lib arg parser
     a = sys.argv[1:]
+
+    if (len(a)>=2 and a[0]=="-omit"):
+        omit=a[1]
+        a=a[2:]
+    else:
+        omit=""
+
     if len(a)<1:
         # default sell all with a commission of 30
         a = ["30"]
@@ -175,7 +186,7 @@ def getArgs():
                 print "unknown ticker "+t
                 sys.exit(1)
                 
-    return (start,end,commission,tickers)
+    return (start,end,commission,tickers,omit)
 
 def usage():
     print "gain (year[:year] | commission) [ticker ticker ... ]"
