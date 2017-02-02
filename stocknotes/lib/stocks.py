@@ -167,6 +167,11 @@ def processFile(fileName, ticker):
     input.close()
     if balance.shares != 0:
         company.keywords.append("owned")
+    else:
+        if len(company.trades)>0:
+            company.keywords.append("sold")
+    if company.buy is not None or company.sell is not None:
+        company.keywords.append("watching")
     return succeed
 
 init()
