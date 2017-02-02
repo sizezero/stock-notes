@@ -1,0 +1,20 @@
+#!/bin/bash
+
+# to get around a hardcoded directory I would have to rewrite this
+# script in python
+D=/home/robert/stock-notes/stocknotes
+
+function list-companies-by-keyword {
+    echo
+    echo "*** $1 ***"
+    echo
+
+    $D/oldest $2 | ( head -5 ; ( dd of=/dev/null &> /dev/null ) )
+}
+
+list-companies-by-keyword Owned "-k owned"
+list-companies-by-keyword Sold "-k sold"
+list-companies-by-keyword Watching "-k watching"
+list-companies-by-keyword All ""
+echo
+
