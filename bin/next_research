@@ -12,6 +12,7 @@ function list-companies-by-keyword {
     $D/oldest $2 | ( head -5 ; ( dd of=/dev/null &> /dev/null ) )
 }
 
+list-companies-by-keyword New "-k new"
 list-companies-by-keyword Owned "-k owned"
 list-companies-by-keyword Sold "-k sold"
 list-companies-by-keyword Watching "-k watching"
