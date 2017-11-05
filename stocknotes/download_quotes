@@ -70,6 +70,10 @@ def alphaVantageQuote(ticker):
     j = alphaVantageGet(ticker)
     if "Error Message" in j:
         return ("0.00","1970/01/01",j["Error Message"])
+    if not ("Time Series (Daily)" in j):
+        print "bad json"
+        print j
+        Sys.exit(1)
     times = j["Time Series (Daily)"].keys()
     times.sort()
     latest = times[-1]
