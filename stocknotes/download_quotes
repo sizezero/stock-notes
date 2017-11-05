@@ -2,6 +2,8 @@
 
 import getopt
 import os
+import re
+import requests
 import string
 import sys
 
@@ -10,9 +12,6 @@ import lib.trade as trade
 import lib.configuration as configuration
 
 """
-s=tick1+tick2
-f=s|1d1t1c1ohgv
-e=.csv
 
 """
 
@@ -35,7 +34,7 @@ def main():
             if c.buy or c.sell:
                 tickers.append(c.ticker)
 
-    downloadYahooCsv(tickers,target_fname)
+    downloadAlphaVantageCsv(tickers,target_fname)
 
 def getArgs():
     if len(sys.argv)==1:
@@ -52,6 +51,62 @@ def downloadYahooCsv(tickers,target_fname):
     doCmd(cmd, 1)
     doCmd("rm "+target_fname, 0)
     doCmd("mv %s %s" % (configuration.TEMP_FILE, target_fname), 1)
+
+dateRe = re.compile(r"^(?P<year>\d+)/(?P<month>\d+)/(?P<day>\d+)$")
+
+# parser expects rows of
+# symbole,price,date
+# where date is MM/DD/YYY
+# TODO: the date is historical and we could refactor this and reader code to use a sensible format
+def downloadAlphaVantageCsv(tickers,target_fname):
+    f = open(target_fname,"w")
+    for ticker in tickers:
+        (quote, date, error) = alphaVantageQuote(ticker)
+        f.write(ticker+","+quote+","+date+","+error+"\n")
+    f.close()
+
+# returns the latest (quote,date,error) for the given ticker
+def alphaVantageQuote(ticker):
+    j = alphaVantageGet(ticker)
+    if "Error Message" in j:
+        return ("0.00","1970/01/01",j["Error Message"])
+    times = j["Time Series (Daily)"].keys()
+    times.sort()
+    latest = times[-1]
+    return (j["Time Series (Daily)"][latest]["4. close"], fixDate(latest), "")
+
+dateRe = re.compile(r"^(?P<year>\d+)-(?P<month>\d+)-(?P<day>\d+)$")
+
+def fixDate(s):
+    result = dateRe.search(s)
+    if not result:
+        print "bad date format: "+s
+        sys.exit(1)
+    return result.group("month")+"/"+result.group("day")+"/"+result.group("year")
+
+# returns a json blob of crap for the given ticker
+# {
+#   "Meta Data": { }
+#   "Time Series (Daily)": {
+#     date (2017-11-01): {
+#       "1. open": "84.0800",
+#       "2. high": "84.5400",
+#       "3. low": "83.4000",
+#       "4. close": "84.1400",
+#       "5. volume": "17569120"
+#     }
+#   }
+# }
+def alphaVantageGet(ticker):
+    payload = {
+        'function': 'TIME_SERIES_DAILY',
+        'symbol': ticker,
+        'apikey': configuration.ALPHA_VANTAGE_ACCESS_KEY }
+    r = requests.get('https://www.alphavantage.co/query', params=payload)
+    if r.status_code != 200:
+        print "error downloading quote, url: "+r.url
+        sys.exit(1)
+    return r.json()
 
 def doCmd(cmd,fail):
     input = os.popen(cmd)
