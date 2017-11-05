@@ -1,4 +1,4 @@
-#!/usr/bin/python
+#!/home/kleemann/opt/bin/python
 
 import cgi
 import re
