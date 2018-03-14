@@ -1,4 +1,4 @@
-_shared = "/home/robert/shared/stocks"
+_shared = "/home/robert/stock-notes-data"
 _project = "/home/robert/stock-notes"
 LOG_DIR = "%s/log" % _shared
 NOTIFY_QUOTES_FILE = "%s/download/quotes_notify.csv" % _shared
