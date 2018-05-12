@@ -1,5 +1,8 @@
 #!/bin/bash
 
+SD=$(dirname "$(readlink -f "$0")")
+D=$SD/../stocknotes
+
 KEYWORD=""
 
 while getopts ":k:" opt; do
@@ -18,4 +21,4 @@ while getopts ":k:" opt; do
   esac
 done
 
-./browse_ticker $(./oldest -t $KEYWORD | head -n 1)
+$D/browse_ticker $(./oldest -t $KEYWORD | head -n 1)

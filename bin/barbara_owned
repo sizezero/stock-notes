@@ -1,3 +1,5 @@
 #!/bin/bash
-../stocknotes/oldest -k barbara_owned
+SD=$(dirname "$(readlink -f "$0")")
+D=$SD/../stocknotes
+$D/oldest -k barbara_owned
 

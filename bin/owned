@@ -1,2 +1,3 @@
 #!/bin/bash
-./oldest -k owned -t
+SD=$(dirname "$(readlink -f "$0")")
+$SD/oldest -k owned -t
