@@ -110,7 +110,7 @@ def alphaVantageGet(ticker):
         'apikey': configuration.ALPHA_VANTAGE_ACCESS_KEY }
     retry = 10
     while True:
-        time.sleep(5)
+        time.sleep(20)
         if retry==0:
             print "error downloading quote, url: "+r.url
             sys.exit(1)
