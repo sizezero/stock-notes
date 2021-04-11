@@ -129,7 +129,7 @@ def main():
     cashAccounts = accounts.values()
     cashAccounts.sort()
     for a in cashAccounts:
-        a.ticker = a.name
+        a.ticker = "$"+a.name
         a.capitalGains = 0
         a.value = a.balanceFloat()
         a.gross = a.value
