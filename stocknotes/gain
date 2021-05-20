@@ -126,16 +126,17 @@ def main():
         companies.append(c)
 
     # add cash accounts as fake companies
-    cashAccounts = accounts.values()
-    cashAccounts.sort()
-    for a in cashAccounts:
-        a.ticker = "$"+a.name
-        a.capitalGains = 0
-        a.value = a.balanceFloat()
-        a.gross = a.value
-        a.ltcg = 1.0
-    # kind of dangerous, we don't want to do anything with companies after this
-    companies.extend(cashAccounts)
+    if len(tickers) > 1:
+        cashAccounts = accounts.values()
+        cashAccounts.sort()
+        for a in cashAccounts:
+            a.ticker = "$"+a.name
+            a.capitalGains = 0
+            a.value = a.balanceFloat()
+            a.gross = a.value
+            a.ltcg = 1.0
+        # kind of dangerous, we don't want to do anything with companies after this
+        companies.extend(cashAccounts)
 
     print "Summary"
     fmt="%10s%15s%5s%15s%15s"
