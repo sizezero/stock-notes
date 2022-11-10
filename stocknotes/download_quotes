@@ -105,7 +105,7 @@ def fixDate(s):
 # }
 def alphaVantageGet(ticker):
     payload = {
-        'function': 'TIME_SERIES_DAILY',
+        'function': 'TIME_SERIES_DAILY_ADJUSTED', # 2022-11-10: TIME_SERIES_DAILY now requires payment
         'symbol': ticker,
         'apikey': configuration.ALPHA_VANTAGE_ACCESS_KEY }
     retry = 10
