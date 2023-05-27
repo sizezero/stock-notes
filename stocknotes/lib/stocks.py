@@ -81,11 +81,11 @@ def init():
         if result:
             if not processFile(
                 os.path.join(LOG_DIR,f),
-                string.upper(result.group("ticker"))):
+                result.group("ticker").upper()):
                 fail = 1
         else:
             if not f.endswith(".txt") and not f.endswith("~"):
-                print "invalid file: "+f
+                print("invalid file: "+f)
                 fail = 1
     if fail:
         # bug: for some reason the importing code is still run
@@ -116,8 +116,8 @@ def processFile(fileName, ticker):
         if nextDate:
             if date:
                 if nextDate < date:
-                    print "warning %s(%d) date entry out of order" \
-                          % (fileName,lineNo)
+                    print("warning %s(%d) date entry out of order" \
+                          % (fileName,lineNo))
                     succeed = None
                 e = Entry(ticker,date,currentText)
                 company.entries.append(e)
@@ -127,11 +127,11 @@ def processFile(fileName, ticker):
             continue
         result = nameRe.search(line)
         if result:
-            company.name=string.strip(result.group("name"))
+            company.name=result.group("name").strip()
             continue
         result = cidRe.search(line)
         if result:
-            company.cid=string.strip(result.group("cid"))
+            company.cid=result.group("cid").strip()
             continue
         try:
             result = tradeRe.search(line)
@@ -154,14 +154,14 @@ def processFile(fileName, ticker):
             company.sell = buysell.parseSell(company.sell, line)
             result = keywordsRe.search(line)
             if result:
-                company.keywords = string.split(result.group("args"))
+                company.keywords = result.group("args").split()
                 for k in company.keywords:
                     result = keywordRe.search(k)
                     if not result:
                         raise ValueError("keywords must be lowercase alphanumeric")
-        except ValueError, ex:
-            print "warning %s(%d) %s" \
-                  % (fileName,lineNo,str(ex))
+        except ValueError as ex:
+            print("warning %s(%d) %s" \
+                  % (fileName,lineNo,str(ex)))
             succeed = None
         currentText = currentText + line
     input.close()

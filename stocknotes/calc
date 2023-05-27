@@ -124,7 +124,7 @@ def main():
                         raise ValueError(keyword+" specified twice")
                     inputDict[keyword]=val
                     matched=1
-                except ValueError,ve:
+                except ValueError as ve:
                     error(str(ve),line)
                 break
         if not matched:
@@ -155,12 +155,12 @@ def main():
     for (title,regex,pd,gs,ds) in lookup:
         keyword = title.lower()
         if inputDict.has_key(keyword):
-            print title,ds(inputDict[keyword])
+            print(title,ds(inputDict[keyword]))
 
 def error(s,line=""):
-    print "Error: "+s
+    print("Error: "+s)
     if line!="":
-        print line
+        print(line)
     sys.exit(1)
         
 def checkLen(a,length):

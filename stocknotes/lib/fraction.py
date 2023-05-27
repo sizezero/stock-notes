@@ -74,7 +74,7 @@ class Fraction:
 			product.reduce()
 		return product
 
-	def __div__(self,fract2):
+	def __truediv__(self,fract2):
 		recip = Fraction(fract2.denominator,fract2.numerator)
 		return self * recip
 

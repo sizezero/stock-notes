@@ -4,10 +4,10 @@ import context
 from stocks import entries
 
 def setup():
-    print "SETUP!"
+    print("SETUP!")
 
 def teardown():
-    print "TEAR DOWN!"
+    print("TEAR DOWN!")
 
 # verify we can at least load the stock entries
 def test_load():

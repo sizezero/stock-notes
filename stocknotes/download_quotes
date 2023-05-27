@@ -43,8 +43,8 @@ def getArgs():
     validArgs = {"notify":1, "buysell":1}
     if len(sys.argv)==2 and validArgs.has_key(sys.argv[1]):
         return sys.argv[1]
-    print "usage: download_quotes ( [ notify | buysell ] )"
-    print "default is notify"
+    print("usage: download_quotes ( [ notify | buysell ] )")
+    print("default is notify")
     sys.exit(1)
 
 def downloadYahooCsv(tickers,target_fname):
@@ -86,7 +86,7 @@ dateRe = re.compile(r"^(?P<year>\d+)-(?P<month>\d+)-(?P<day>\d+)$")
 def fixDate(s):
     result = dateRe.search(s)
     if not result:
-        print "bad date format: "+s
+        print("bad date format: "+s)
         sys.exit(1)
     return result.group("month")+"/"+result.group("day")+"/"+result.group("year")
 
@@ -112,7 +112,7 @@ def alphaVantageGet(ticker):
     while True:
         time.sleep(20)
         if retry==0:
-            print "error downloading quote, url: "+r.url
+            print("error downloading quote, url: "+r.url)
             sys.exit(1)
         r = requests.get('https://www.alphavantage.co/query', params=payload)
         if r.status_code == 200:
@@ -127,11 +127,11 @@ def doCmd(cmd,fail):
     input = os.popen(cmd)
     out = input.read()
     ret = input.close()
-    print out
-    print "ret",ret
+    print(out)
+    print("ret",ret)
     if fail and ret is not None:
-        print "error running: "+cmd
-        print out
+        print("error running: "+cmd)
+        print(out)
         sys.exit(1)
 
 main()

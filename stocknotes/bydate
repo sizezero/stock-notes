@@ -14,13 +14,13 @@ def main():
 
     for tup in tups:
         e = entries[tup]
-        print "%s %s %s" % \
+        print("%s %s %s" % \
             (e.date,
              e.ticker,
-             stocks.companies[e.ticker].name)
-        print
-        print e.text
-        print
+             stocks.companies[e.ticker].name))
+        print()
+        print(e.text)
+        print()
 
 main()
 

@@ -15,7 +15,7 @@ def main():
         opts[opt] = val
     noEdit = opts.has_key("-n")
     if len(args) != 1:
-        print "usage: browseticker [-n] ticker"
+        print("usage: browseticker [-n] ticker")
         sys.exit(1)
     ticker = string.upper(args[0])
 

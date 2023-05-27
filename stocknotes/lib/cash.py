@@ -66,7 +66,7 @@ def init():
                 fail = 1
         else:
             if not f.endswith(".txt") and not f.endswith("~"):
-                print "invalid file: "+f
+                print("invalid file: "+f)
                 fail = 1
     if fail:
         # bug: for some reason the importing code is still run
@@ -88,23 +88,23 @@ def processFile(fileName, accountName):
         nextDate = parseDate(line)
         if nextDate:
             if account.date:
-                print "warning %s(%d) date already entered" \
-                          % (fileName,lineNo)
+                print("warning %s(%d) date already entered" \
+                          % (fileName,lineNo))
                 succeed = None
             account.date = nextDate
             continue
         result = balanceRe.search(line)
         if result:
             if account.balance:
-                print "warning %s(%d) balance already entered" \
-                          % (fileName,lineNo)
+                print("warning %s(%d) balance already entered" \
+                          % (fileName,lineNo))
                 succeed = None
             account.balance=int(re.sub('[.,]','',result.group("balance")))
             continue
     input.close()
     if account.balance is None:
-        print "warning %s balance not entered" \
-            % (fileName)
+        print("warning %s balance not entered" \
+            % (fileName))
         succeed = None
     return succeed
         

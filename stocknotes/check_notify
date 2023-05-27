@@ -33,6 +33,6 @@ def main():
                     if lookup.has_key("--email"):
                         n.email(c,mult,lookup["--email"])
                     else:
-                        print s
+                        print(s)
 
 main()

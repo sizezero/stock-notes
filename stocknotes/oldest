@@ -34,12 +34,12 @@ def main():
     for (d,t) in tups:
         if not keyword or keyword in stocks.companies[t].keywords:
             if tickerOnly:
-                print t
+                print(t)
             else:
-                print "%s %s %s" % \
+                print("%s %s %s" % \
                     (d.abbreviated(),
                      t,
-                     stocks.companies[t].name)
+                     stocks.companies[t].name))
 
 main()
 

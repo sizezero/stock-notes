@@ -23,7 +23,7 @@ class Quotes:
             line=f.readline()
             if line=="":
                 break
-            row = string.split(line,",")
+            row = line.split(",")
             ticker = _noQuotes(row[0])
             q=Quote()
             q.price=float(_noQuotes(row[1]))

@@ -91,8 +91,8 @@ def main():
                 # possibly display sale data
                 if commission < 0.0 and r.date>=start and r.date<=end:
                     if not headerPrinted:
-                        print t
-                        print
+                        print(t)
+                        print()
                         headerPrinted=1
                     printSell(r,mult)
                     c.value += r.value
@@ -104,11 +104,11 @@ def main():
         if commission > 0.0 and balance!=sharesm.zero:
             # add a mock sale if there is a positive balance
             if not quotes.has_key(t):
-                print "!!! no quote !!!"
+                print("!!! no quote !!!")
             else:
                 if not headerPrinted:
-                    print t
-                    print
+                    print(t)
+                    print()
                     headerPrinted=1
                 q = quotes[t]
                 sell = trade.Sell(q.date,balance,Price(q.price,mult),commission)
@@ -138,9 +138,9 @@ def main():
         # kind of dangerous, we don't want to do anything with companies after this
         companies.extend(cashAccounts)
 
-    print "Summary"
+    print("Summary")
     fmt="%10s%15s%5s%15s%15s"
-    print fmt % ("ticker","value","%","cap gains","ltcg")
+    print(fmt % ("ticker","value","%","cap gains","ltcg"))
     cumValue = 0.0
     cumCapitalGains = 0.0
     for c in companies:
@@ -151,10 +151,10 @@ def main():
             ltcgPcnt = c.ltcg/c.gross
         else:
             ltcgPcnt = 0.0
-        print fmt % (c.ticker, dollar2str(c.value), pcnt2str(c.value/cumValue), dollar2str(c.capitalGains),pcnt2str(ltcgPcnt))
-    print "=" * 50
-    print fmt % ("",dollar2str(cumValue),"100%",dollar2str(cumCapitalGains),"")
-    print
+        print(fmt % (c.ticker, dollar2str(c.value), pcnt2str(c.value/cumValue), dollar2str(c.capitalGains),pcnt2str(ltcgPcnt)))
+    print("=" * 50)
+    print(fmt % ("",dollar2str(cumValue),"100%",dollar2str(cumCapitalGains),""))
+    print()
 
 def getArgs():
     # TODO replace with lib arg parser
@@ -197,13 +197,13 @@ def getArgs():
         tickers=map(string.upper,a)
         for t in tickers:
             if not stocks.companies.has_key(t):
-                print "unknown ticker "+t
+                print("unknown ticker "+t)
                 sys.exit(1)
                 
     return (start,end,commission,tickers,omit)
 
 def usage():
-    print "gain (year[:year] | commission) [ticker ticker ... ]"
+    print("gain (year[:year] | commission) [ticker ticker ... ]")
     sys.exit(1)
 
 class Transaction:
@@ -271,32 +271,32 @@ def sharesAtPrice2str(shares,price,mult):
     return "%d@%.2f" % (shares.atMult(mult),price.atMult(mult))
 
 def printSell(sell,mult):
-    print "%s sell %d@%.2f $%.2f commission $%.2f" % (str(sell.date),sell.shares.atMult(mult),sell.price.atMult(mult),sell.gross,sell.commission)
-    print itemFmt % ("purchase date","","share@price","cost","buy fee","sell fee","annual yield")
+    print("%s sell %d@%.2f $%.2f commission $%.2f" % (str(sell.date),sell.shares.atMult(mult),sell.price.atMult(mult),sell.gross,sell.commission))
+    print(itemFmt % ("purchase date","","share@price","cost","buy fee","sell fee","annual yield"))
     for t in sell.transactions:
-        print itemFmt % (
+        print(itemFmt % (
             t.buy.date.abbreviated(),
             "(ltcg)" if t.ltcg else "",
             sharesAtPrice2str(t.shares,t.buy.price,mult),
             dollar2str(t.cost),
             dollar2str(t.buyCommission),
             dollar2str(t.sellCommission),
-            pcnt2str(t.annualYield))
+            pcnt2str(t.annualYield)))
     if (sell.cost < 0.01):
         # TODO: this is wrong
         avgPurchasePrice = Price(0.0,fraction.one)
     else:
         avgPurchasePrice = Price(sell.cost/sell.shares.atMult(mult),mult)
-    print itemFmt % (
+    print(itemFmt % (
         "",
         "=",
         sharesAtPrice2str(sell.shares,avgPurchasePrice,mult),
         dollar2str(sell.cost),
         dollar2str(sell.totalCommission - sell.commission),
         dollar2str(sell.commission),
-        "???")
-    print "cap gain %s" % \
-          (dollar2str(sell.capitalGain),)
-    print
+        "???"))
+    print("cap gain %s" % \
+          (dollar2str(sell.capitalGain),))
+    print()
 
 main()

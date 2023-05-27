@@ -1,2 +1,2 @@
 #!/bin/bash
-nosetests stocknotes
+nosetests3 stocknotes

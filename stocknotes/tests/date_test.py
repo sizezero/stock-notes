@@ -4,10 +4,10 @@ import context
 from date import *
 
 def setup():
-    print "SETUP!"
+    print("SETUP!")
 
 def teardown():
-    print "TEAR DOWN!"
+    print("TEAR DOWN!")
 
 def test_parse():
     assert parseDate("apr 24, 1968") == Date(1968,4,24)

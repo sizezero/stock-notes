@@ -7,8 +7,8 @@ import lib.stocks as stocks
 def main():
     for c in stocks.companies.values():
         if len(c.trades)>0:
-            print c.ticker
+            print(c.ticker)
             for t in c.trades:
-                print " ",t
+                print(" ",t)
 
 main()

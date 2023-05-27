@@ -2,6 +2,7 @@
 import re
 import string
 import time
+from functools import total_ordering
 
 number2month = {
     1:"January", 2:"February", 3:"March", 4:"April",
@@ -10,7 +11,7 @@ number2month = {
 
 month2number = {}
 for number in number2month.keys():
-    smonth = string.lower(number2month[number])
+    smonth = number2month[number].lower()
     month2number[smonth] = number
     # add abbreviations such as "Jan" to the lookup
     month2number[smonth[0:3]] = number
@@ -48,12 +49,18 @@ class Date:
         self.month = month
         self.day = day
 
-    def __cmp__(self,other):
-        if self.year != other.year:
-            return cmp(self.year,other.year)
-        if self.month != other.month:
-            return cmp(self.month,other.month)
-        return cmp(self.day,other.day)
+    def __lt__(self,other):
+        if self.year < other.year:
+            return True
+        elif self.year == other.year:
+            if self.month < other.month:
+                return True
+            elif self.month == other.month:
+                return self.day < other.day
+        return False
+
+    def __eq__(self,other):
+        return self.year==other.year and self.month==other.month and self.day==other.day
 
     def wordy(self):
         return "%s %d, %d" % (number2month[self.month], self.day, self.year)
@@ -81,8 +88,8 @@ def parseDate(line):
     result = dateRe.search(line)
     if not result:
         return None
-    smonth = string.lower(result.group("month"))
-    if not month2number.has_key(smonth):
+    smonth = result.group("month").lower()
+    if not smonth in month2number:
         return None
     return Date(int(result.group("year")),
             month2number[smonth],
