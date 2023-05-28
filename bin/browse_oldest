@@ -21,4 +21,4 @@ while getopts ":k:" opt; do
   esac
 done
 
-$D/browse_ticker $(./oldest -t $KEYWORD | head -n 1)
+$D/browse_ticker $($D/oldest -t $KEYWORD | head -n 1)
