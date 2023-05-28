@@ -1,13 +1,14 @@
-#!/home/kleemann/opt/bin/python
+#!/usr/bin/python3
 
 import re
 import os
 import os.path
 import string
 import sys
+from functools import total_ordering
 
-from date import Date,parseDate,today
-from configuration import CASH_DIR
+from lib.date import Date,parseDate,today
+from lib.configuration import CASH_DIR
 
 ################################################
 
@@ -21,8 +22,11 @@ class Account:
         self.date = None
         self.balance = None
 
-    def __cmp__(self,other):
-        return cmp(self.name,other.name)
+    def __lt__(self,other):
+        return self.name < other.name
+
+    def __eq__(self,other):
+        return self.name == other.name
 
     def balanceString(self):
         s = ""
@@ -62,7 +66,7 @@ def init():
         if result:
             if not processFile(
                 os.path.join(CASH_DIR,f),
-                string.upper(result.group("account"))):
+                result.group("account").upper()):
                 fail = 1
         else:
             if not f.endswith(".txt") and not f.endswith("~"):

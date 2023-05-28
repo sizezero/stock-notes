@@ -1,4 +1,4 @@
-#!/home/kleemann/opt/bin/python
+#!/usr/bin/python3
 
 import re
 import string
@@ -127,7 +127,7 @@ def main():
 
     # add cash accounts as fake companies
     if len(tickers) > 1:
-        cashAccounts = accounts.values()
+        cashAccounts = list(accounts.values())
         cashAccounts.sort()
         for a in cashAccounts:
             a.ticker = "$"+a.name
@@ -191,7 +191,7 @@ def getArgs():
 
     a.pop(0)
     if len(a)==0:
-        tickers=stocks.companies.keys()
+        tickers=list(stocks.companies.keys())
         tickers.sort()
     else:
         tickers=map(string.upper,a)

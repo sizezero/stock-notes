@@ -1,18 +1,19 @@
-#!/home/kleemann/opt/bin/python
+#!/usr/bin/python3
 
 import re
 import os
 import os.path
 import string
 import sys
+from functools import total_ordering
 
-from date import Date,parseDate,today
-import fraction
-import notify
-import shares
-from trade import parseTrade
-import buysell
-from configuration import LOG_DIR
+from lib.date import Date,parseDate,today
+import lib.fraction
+import lib.notify
+import lib.shares
+from lib.trade import parseTrade
+import lib.buysell
+from lib.configuration import LOG_DIR
 
 ################################################
 
@@ -26,10 +27,13 @@ class Entry:
         self.date = date
         self.text = text
 
-    def __cmp__(self,other):
+    def __lt__(self,other):
         if self.ticker!=other.ticker:
-            return cmp(self.ticker,other.ticker)
-        return cmp(self.date,other.date)
+            return self.ticker < other.ticker
+        return self.date < other.date
+
+    def __eq__(self,other):
+        return self.ticker==other.ticker and self.date==other.date
 
 ################################################
 
@@ -45,13 +49,16 @@ class Company:
         self.ticker = ticker
         self.entries=[]
         self.trades=[]
-        self.notifies = notify.makeArray()
+        self.notifies = lib.notify.makeArray()
         self.keywords=[]
         self.buy = None
         self.sell = None
 
-    def __cmp__(self,other):
-        return cmp(self.ticker,other.ticker)
+    def __lt__(self,other):
+        return self.ticker < other.ticker
+
+    def __eq__(self,other):
+        return self.ticker == other.ticker
 
 ################################################
 
@@ -98,8 +105,8 @@ def processFile(fileName, ticker):
     companies[ticker] = company
     date = None
     currentText = ""
-    mult=fraction.one
-    balance=shares.zero
+    mult=lib.fraction.one
+    balance=lib.shares.zero
     input = open(fileName,'r')
     lineNo = 0
     succeed = 1
@@ -148,10 +155,10 @@ def processFile(fileName, ticker):
                                     % (balance.atMult(mult),
                                        parseBalance.atMult(mult)))
                 company.trades.append(trade)
-            if notify.notifyRe.search(line):
-                notify.parseNotify(line,mult,company.notifies)
-            company.buy = buysell.parseBuy(company.buy, line)
-            company.sell = buysell.parseSell(company.sell, line)
+            if lib.notify.notifyRe.search(line):
+                lib.notify.parseNotify(line,mult,company.notifies)
+            company.buy = lib.buysell.parseBuy(company.buy, line)
+            company.sell = lib.buysell.parseSell(company.sell, line)
             result = keywordsRe.search(line)
             if result:
                 company.keywords = result.group("args").split()

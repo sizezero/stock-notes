@@ -1,7 +1,8 @@
 
 import re
+from functools import total_ordering
 
-from fraction import Fraction
+from lib.fraction import Fraction
 
 class Shares:
     """ combines the numerical share value with the split multiple. """
@@ -30,19 +31,25 @@ class Shares:
                 self.shares*other.mult.toFloat() - \
                 other.shares*self.mult.toFloat(),
                 self.mult*other.mult)
-    def __div__(self,other):
+    def __truediv__(self,other):
         return (self.shares*other.mult.toFloat()) / (other.shares*self.mult.toFloat())
     def __iadd__(self,other):
         return self + other
     def __isub__(self,other):
         return self - other
-    def __cmp__(self,other):
+    def __lt__(self,other):
         if self.shares==0 and other.shares==0:
-            return 0
+            return False
         if self.shares==other.shares and self.mult==other.mult:
-            return 0
-        return cmp(round(self.shares/self.mult.toFloat()),
-                   round(other.shares/other.mult.toFloat()))
+            return False
+        return round(self.shares/self.mult.toFloat()) < \
+          round(other.shares/other.mult.toFloat())
+    def __eq__(self,other):
+        if self.shares==0 and other.shares==0:
+            return True
+        if self.shares==other.shares and self.mult==other.mult:
+            return True
+        return round(self.shares/self.mult.toFloat()) == round(other.shares/other.mult.toFloat())
 
 zero = Shares(0,Fraction(1,1))
 

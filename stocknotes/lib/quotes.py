@@ -1,6 +1,6 @@
 
-from date import Date
-from configuration import NOTIFY_QUOTES_FILE
+from lib.date import Date
+from lib.configuration import NOTIFY_QUOTES_FILE
 import re
 import string
 
@@ -35,7 +35,7 @@ class Quotes:
         return self.quotes[key]
 
     def has_key(self,key):
-        return self.quotes.has_key(key)
+        return key in self.quotes
 
 def _parseCsvDate(s):
     if s=="N/A":

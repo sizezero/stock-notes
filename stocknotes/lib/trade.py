@@ -1,10 +1,10 @@
 
 import re
 
-from date import Date
-import fraction
-import price as pricem
-import shares as sharesm
+from lib.date import Date
+import lib.fraction
+import lib.price as pricem
+import lib.shares as sharesm
 
 class Trade:
     date=Date(1900,1,1)
@@ -182,7 +182,7 @@ multRe = re.compile(r"^(?P<numerator>\d+):(?P<denominator>\d+)$")
 def parseMult(s):
     result = multRe.search(s)
     if result:
-        return fraction.Fraction(int(result.group("numerator")),
+        return lib.fraction.Fraction(int(result.group("numerator")),
                                  int(result.group("denominator")))
     raise ValueError("expected mult ratio n:n")
 

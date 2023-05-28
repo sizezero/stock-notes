@@ -1,7 +1,7 @@
 
 import re
 
-from fraction import Fraction
+from lib.fraction import Fraction
 
 class Price:
     """ combines the numerical share value with the split multiple. """

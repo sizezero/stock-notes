@@ -3,8 +3,8 @@ import os
 import re
 import string
 
-import date
-import price
+import lib.date
+import lib.price
 
 class Notify:
 
@@ -77,7 +77,7 @@ class NotifyPriceFactory(NotifyFactory):
         if result:
             notifies[self.index] = NotifyPrice(
                 result.group("compare"),
-                price.parsePrice(result.group("price"),mult),
+                lib.price.parsePrice(result.group("price"),mult),
                 result.group("comment"))
             return 1
         if self.nullRegex.search(line):
@@ -115,7 +115,7 @@ class NotifyDateFactory(NotifyFactory):
         result = self.regex.search(line)
         if result:
             notifies[self.index] = NotifyDate(
-                date.parseDate(result.group("date")),
+                lib.date.parseDate(result.group("date")),
                 result.group("comment"))
             return 1
         if self.nullRegex.search(line):
