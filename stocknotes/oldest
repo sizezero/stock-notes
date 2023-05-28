@@ -27,7 +27,7 @@ def main():
             if e.date>olddate:
                 ticker2olddate[e.ticker]=(e.date,e.ticker)
 
-    tups = ticker2olddate.values()
+    tups = list(ticker2olddate.values())
     tups.sort()
     if "-r" in opts:
         tups.reverse()
