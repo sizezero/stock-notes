@@ -17,24 +17,24 @@ def main():
     keywords = {} # keyword ==> [ tickers ]
     
     for c in stocks.companies.values():
-    	for k in c.keywords:
-	    if k in keywords:
+        for k in c.keywords:
+            if k in keywords:
                 keywords[k].append(c.ticker)
-	    else:
-		keywords[k] = [c.ticker]
+            else:
+                keywords[k] = [c.ticker]
 
     if verbose:
-        tmp = keywords.keys()
+        tmp = list(keywords.keys())
         tmp.sort()
-	for k in tmp:
+        for k in tmp:
             tmp2 = keywords[k]
             tmp2.sort()
-	    print(k+": "+",".join(tmp2))
+            print(k+": "+",".join(tmp2))
     else:
-        tmp = keywords.keys()
+        tmp = list(keywords.keys())
         tmp.sort()
-	for k in tmp:
-	    print(k)
+        for k in tmp:
+            print(k)
 
 main()
 
