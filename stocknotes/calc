@@ -140,7 +140,7 @@ def main():
                 missing=1
                 break
         if not missing:
-            error("keyword conflict: "+string.join(c))
+            error("keyword conflict: "+" ".join(c))
     while 1:
         startingLen=len(inputDict)
         for (keyword,regex,pd,gs,ds) in lookup:

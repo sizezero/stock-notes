@@ -49,7 +49,7 @@ def getArgs():
     sys.exit(1)
 
 def downloadYahooCsv(tickers,target_fname):
-    cmd = "wget -O %s 'http://finance.yahoo.com/d/quotes.csv?s=%s&f=sl1d1t1c1ohgv&e=.csv'" % (configuration.TEMP_FILE, string.join(tickers,"+"))
+    cmd = "wget -O %s 'http://finance.yahoo.com/d/quotes.csv?s=%s&f=sl1d1t1c1ohgv&e=.csv'" % (configuration.TEMP_FILE, "+".join(tickers))
     doCmd(cmd, 1)
     doCmd("rm "+target_fname, 0)
     doCmd("mv %s %s" % (configuration.TEMP_FILE, target_fname), 1)

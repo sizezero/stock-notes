@@ -29,7 +29,7 @@ def main():
 	for k in tmp:
             tmp2 = keywords[k]
             tmp2.sort()
-	    print(k+": "+string.join(tmp2,","))
+	    print(k+": "+",".join(tmp2))
     else:
         tmp = keywords.keys()
         tmp.sort()
