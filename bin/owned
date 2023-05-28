@@ -1,3 +1,4 @@
 #!/bin/bash
 SD=$(dirname "$(readlink -f "$0")")
-$SD/oldest -k owned -t
+D=$SD/../stocknotes
+$D/oldest -k owned -t
