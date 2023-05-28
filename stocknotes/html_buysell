@@ -30,9 +30,9 @@ def main():
     reverse = "reverse" in form and form["reverse"].value=="1"
     bydate = "order" in form and form["order"].value=="bydate"
     if (bydate):
-        cos.sort(None,lambda c: c.entries[-1].date,reverse)
+        cos.sort(key=lambda c: c.entries[-1].date,reverse=reverse)
     else:
-        cos.sort(None,lambda c: c.ticker,reverse)
+        cos.sort(key=lambda c: c.ticker,reverse=reverse)
 
     print("<table border=1>")
     print("<tr>")
@@ -42,7 +42,7 @@ def main():
 
     for c in cos:
         print('<tr><td><a href="http://finance.yahoo.com/q?s=%s">%s</a></td>' % \
-            (string.lower(html.escape(c.ticker)),
+            (html.escape(c.ticker).lower(),
              html.escape(c.ticker)))
         #print("<tr><td>"+c.ticker+"</td><td>")
         td('b')
@@ -86,7 +86,7 @@ def main():
             td()
         print("</font></td>")
         print('<td><a href="log.cgi?ticker=%s">%s</a></td>' % \
-            (string.lower(html.escape(c.ticker)),
+            (html.escape(c.ticker).lower(),
              c.entries[-1].date))
         print("</tr>")
 
