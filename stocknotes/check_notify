@@ -5,21 +5,21 @@
 import getopt
 import sys
 
-import date
-import fraction
-from price import Price
-from quotes import Quotes
-import stocks
+import lib.date
+import lib.fraction
+from lib.price import Price
+from lib.quotes import Quotes
+import lib.stocks
 
 def main():
     (pairs,args) = getopt.getopt(sys.argv[1:],"",["all","email=","date="])
     lookup = dict(pairs)
 
-    nullPrice = Price(1.0,fraction.one)
+    nullPrice = Price(1.0,lib.fraction.one)
     quotes = Quotes()
 
-    for c in stocks.companies.values():
-        mult = fraction.one
+    for c in lib.stocks.companies.values():
+        mult = lib.fraction.one
         for r in c.trades:
             mult=r.multAdjust(mult)
         if c.ticker in quotes:
@@ -27,7 +27,7 @@ def main():
         else:
             price = nullPrice
         for n in c.notifies:
-            if "--all" in lookup or n.isTriggered(price,date.today):
+            if "--all" in lookup or n.isTriggered(price,lib.date.today):
                 s = n.lineItem(c,mult)
                 if s != "":
                     if "--email" in lookup:

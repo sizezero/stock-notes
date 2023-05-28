@@ -8,7 +8,7 @@ def main():
     for e in stocks.entries:
         entries[(e.date,e.ticker)] = e
         
-    tups = entries.keys()
+    tups = list(entries.keys())
     tups.sort()
     tups.reverse()
 
