@@ -7,6 +7,7 @@ import requests
 import string
 import sys
 import time
+from functools import reduce
 
 import lib.stocks as stocks
 import lib.trade as trade
@@ -76,7 +77,7 @@ def alphaVantageQuote(ticker):
         return ("0.00","1970/01/01",j["Error Message"]+" "+j["url"])
     if not ("Time Series (Daily)" in j):
         return ("0.00","1970/01/01","Bad JSON")
-    times = j["Time Series (Daily)"].keys()
+    times = list(j["Time Series (Daily)"].keys())
     times.sort()
     latest = times[-1]
     return (j["Time Series (Daily)"][latest]["4. close"], fixDate(latest), "")
