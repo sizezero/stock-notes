@@ -13,7 +13,7 @@ def main():
     opts = {}
     for (opt,val) in optlist:
         opts[opt] = val
-    noEdit = opts.has_key("-n")
+    noEdit = "-n" in opts
     if len(args) != 1:
         print("usage: browseticker [-n] ticker")
         sys.exit(1)
@@ -26,7 +26,7 @@ def main():
 
     urls.append("http://www.morningstar.com/content/morningstarcom/en_us/stocks/xnas/%s/quote.html" % (ticker,))
 
-    if stocks.companies.has_key(ticker):
+    if ticker in stocks.companies:
         cid = stocks.companies[ticker].cid
     else:
         cid="<none>"

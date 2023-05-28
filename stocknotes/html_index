@@ -1,6 +1,7 @@
 #!/usr/bin/python3
 
 import cgi
+import html
 import string
 import sys
 
@@ -30,7 +31,7 @@ def main():
             s=e.date
         else:
             s=e.ticker
-        if not ticker2olddate.has_key(e.ticker):
+        if not e.ticker in ticker2olddate:
             ticker2olddate[e.ticker]=(s,e.date,e.ticker)
         else:
             olddate = ticker2olddate[e.ticker][1]
@@ -39,28 +40,28 @@ def main():
 
     byDateArg=""
     byTickerArg=""
-    if bydate and not form.has_key("reverse"):
+    if bydate and not "reverse" in form:
         byDateArg="?reverse=1"
-    if not bydate and not form.has_key("reverse"):
+    if not bydate and not "reverse" in form:
         byTickerArg="?reverse=1"
         
     print("<p><table>")
     print('<tr><td><a href="bydate.cgi'+byDateArg+'"><b>Date</b></a></td><td><a href="byticker.cgi'+byTickerArg+'"><b>Ticker</b></a></td><td><b>Name</b></td></tr>')
 
-    tups = ticker2olddate.values()
+    tups = list(ticker2olddate.values())
     tups.sort()
-    if form.has_key("reverse"):
+    if "reverse" in form:
         tups.reverse()
     if bydate:
         tups.reverse()
     for (s,d,t) in tups:
         link = '<a href="log.cgi?ticker=%s">%s</a>' % \
-               (string.lower(cgi.escape(t)),
-                cgi.escape(t))
+                (html.escape(t).lower(), \
+                html.escape(t))
         print("<tr><td>%s</td><td>%s</td><td>%s</td></tr>" % \
-              (cgi.escape(d.abbreviated()),
+              (html.escape(d.abbreviated()),
                link,
-               cgi.escape(stocks.companies[t].name)))
+               html.escape(stocks.companies[t].name)))
 
     print("</table>")
 

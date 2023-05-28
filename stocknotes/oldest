@@ -11,8 +11,8 @@ def main():
     opts = {}
     for (opt,val) in optlist:
         opts[opt] = val
-    tickerOnly = opts.has_key("-t")
-    if opts.has_key("-k"):
+    tickerOnly = "-t" in opts
+    if "-k" in opts:
         keyword = opts["-k"]
     else:
         keyword = None
@@ -20,7 +20,7 @@ def main():
     ticker2olddate = {} # ticker ==> (date,ticker)
     
     for e in stocks.entries:
-        if not ticker2olddate.has_key(e.ticker):
+        if not e.ticker in ticker2olddate:
             ticker2olddate[e.ticker]=(e.date,e.ticker)
         else:
             olddate = ticker2olddate[e.ticker][0]
@@ -29,7 +29,7 @@ def main():
 
     tups = ticker2olddate.values()
     tups.sort()
-    if opts.has_key("-r"):
+    if "-r" in opts:
         tups.reverse()
     for (d,t) in tups:
         if not keyword or keyword in stocks.companies[t].keywords:

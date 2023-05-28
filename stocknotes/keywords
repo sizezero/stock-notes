@@ -12,13 +12,13 @@ def main():
     opts = {}
     for (opt,val) in optlist:
         opts[opt] = val
-    verbose = opts.has_key("-v")
+    verbose = "-v" in opts
 
     keywords = {} # keyword ==> [ tickers ]
     
     for c in stocks.companies.values():
     	for k in c.keywords:
-	    if keywords.has_key(k):
+	    if k in keywords:
                 keywords[k].append(c.ticker)
 	    else:
 		keywords[k] = [c.ticker]

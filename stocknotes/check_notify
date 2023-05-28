@@ -22,15 +22,15 @@ def main():
         mult = fraction.one
         for r in c.trades:
             mult=r.multAdjust(mult)
-        if quotes.has_key(c.ticker):
+        if c.ticker in quotes:
             price = Price(quotes[c.ticker].price,mult)
         else:
             price = nullPrice
         for n in c.notifies:
-            if lookup.has_key("--all") or n.isTriggered(price,date.today):
+            if "--all" in lookup or n.isTriggered(price,date.today):
                 s = n.lineItem(c,mult)
                 if s != "":
-                    if lookup.has_key("--email"):
+                    if "--email" in lookup:
                         n.email(c,mult,lookup["--email"])
                     else:
                         print(s)

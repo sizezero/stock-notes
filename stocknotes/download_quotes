@@ -42,7 +42,7 @@ def getArgs():
     if len(sys.argv)==1:
         return "notify"
     validArgs = {"notify":1, "buysell":1}
-    if len(sys.argv)==2 and validArgs.has_key(sys.argv[1]):
+    if len(sys.argv)==2 and sys.argv[1] in validArgs:
         return sys.argv[1]
     print("usage: download_quotes ( [ notify | buysell ] )")
     print("default is notify")

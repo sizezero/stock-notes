@@ -1,6 +1,7 @@
 #!/usr/bin/python3
 
 import cgi
+import html
 import string
 import sys
 
@@ -26,8 +27,8 @@ def main():
             cos.append(c)
 
     form = cgi.FieldStorage()
-    reverse = form.has_key("reverse") and form["reverse"].value=="1"
-    bydate = form.has_key("order") and form["order"].value=="bydate"
+    reverse = "reverse" in form and form["reverse"].value=="1"
+    bydate = "order" in form and form["order"].value=="bydate"
     if (bydate):
         cos.sort(None,lambda c: c.entries[-1].date,reverse)
     else:
@@ -41,21 +42,21 @@ def main():
 
     for c in cos:
         print('<tr><td><a href="http://finance.yahoo.com/q?s=%s">%s</a></td>' % \
-            (string.lower(cgi.escape(c.ticker)),
-             cgi.escape(c.ticker)))
+            (string.lower(html.escape(c.ticker)),
+             html.escape(c.ticker)))
         #print("<tr><td>"+c.ticker+"</td><td>")
         td('b')
-        if quotes.has_key(c.ticker):
+        if c.ticker in quotes:
             print(quotes[c.ticker].price)
         print("</font></td>")
         if c.buy:
-            if quotes.has_key(c.ticker) and quotes[c.ticker].price < c.buy.price1:
+            if c.ticker in quotes and quotes[c.ticker].price < c.buy.price1:
                 td('g')
             else:
                 td()
             print(c.buy.price1)
             if c.buy.price2:
-                if quotes.has_key(c.ticker) and quotes[c.ticker].price < c.buy.price2:
+                if c.ticker in quotes and quotes[c.ticker].price < c.buy.price2:
                     td('g')
                 else:
                     td()
@@ -68,14 +69,14 @@ def main():
         print("</font></td>")
         if c.sell:
             if c.sell.price2:
-                if quotes.has_key(c.ticker) and quotes[c.ticker].price > c.sell.price2:
+                if c.ticker in quotes and quotes[c.ticker].price > c.sell.price2:
                     td('r')
                 else:
                     td()
                 print(c.sell.price2)
             else:
                 td()
-            if quotes.has_key(c.ticker) and quotes[c.ticker].price > c.sell.price1:
+            if c.ticker in quotes and quotes[c.ticker].price > c.sell.price1:
                 td('r')
             else:
                 td()
@@ -85,7 +86,7 @@ def main():
             td()
         print("</font></td>")
         print('<td><a href="log.cgi?ticker=%s">%s</a></td>' % \
-            (string.lower(cgi.escape(c.ticker)),
+            (string.lower(html.escape(c.ticker)),
              c.entries[-1].date))
         print("</tr>")
 

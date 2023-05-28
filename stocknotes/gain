@@ -103,7 +103,7 @@ def main():
 
         if commission > 0.0 and balance!=sharesm.zero:
             # add a mock sale if there is a positive balance
-            if not quotes.has_key(t):
+            if not t in quotes:
                 print("!!! no quote !!!")
             else:
                 if not headerPrinted:
@@ -196,7 +196,7 @@ def getArgs():
     else:
         tickers=map(string.upper,a)
         for t in tickers:
-            if not stocks.companies.has_key(t):
+            if not t in stocks:
                 print("unknown ticker "+t)
                 sys.exit(1)
                 

@@ -34,7 +34,7 @@ class Quotes:
     def __getitem__(self,key):
         return self.quotes[key]
 
-    def has_key(self,key):
+    def __contains__(self,key):
         return key in self.quotes
 
 def _parseCsvDate(s):

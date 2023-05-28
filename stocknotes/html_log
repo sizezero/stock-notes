@@ -38,7 +38,7 @@ def disp2(ticker):
         lineNo = lineNo + 1
         if line=="":
             break
-        print(cgi.escape(line)+"<br>")
+        print(html.escape(line)+"<br>")
     input.close()
 
 main()

@@ -18,7 +18,7 @@ def main():
     # verify tickers
     invalidTicker=0
     for t in tickers:
-        if not stocks.companies.has_key(t):
+        if not t in stocks:
             print("invalid ticker: "+t)
             invalidTicker=1
         

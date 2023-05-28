@@ -120,7 +120,7 @@ def main():
             if regex.search(a[0].lower()):
                 try:
                     val=pd(a[1:])
-                    if inputDict.has_key(keyword):
+                    if keyword in inputDict:
                         raise ValueError(keyword+" specified twice")
                     inputDict[keyword]=val
                     matched=1
@@ -136,7 +136,7 @@ def main():
     for c in conflicts:
         missing=0
         for keyword in c:
-            if not inputDict.has_key(keyword):
+            if not keyword in inputDict:
                 missing=1
                 break
         if not missing:
@@ -145,7 +145,7 @@ def main():
         startingLen=len(inputDict)
         for (keyword,regex,pd,gs,ds) in lookup:
             keyword = keyword.lower()
-            if not inputDict.has_key(keyword):
+            if not keyword in inputDict:
                 val=gs(inputDict)
                 if val is not None:
                     inputDict[keyword]=val
@@ -154,7 +154,7 @@ def main():
             break
     for (title,regex,pd,gs,ds) in lookup:
         keyword = title.lower()
-        if inputDict.has_key(keyword):
+        if keyword in inputDict:
             print(title,ds(inputDict[keyword]))
 
 def error(s,line=""):
@@ -263,29 +263,29 @@ def genRevenue(d):
     return None
 
 def genEps(d):
-    if d.has_key("income") and d.has_key("shares"):
+    if "income" in d and "shares" in d:
         return d["income"] / d["shares"]
     else:
         return None
 
 def genPe(d):
-    if d.has_key("price") and d.has_key("eps"):
+    if "price" in d and "eps" in d:
         return d["price"] / d["eps"]
-    elif d.has_key("mc") and d.has_key("income"):
+    elif "mc" in d and "income" in d:
         return d["mc"] / d["income"]
     else:
         return None
 
 def genMc(d):
-    if d.has_key("price") and d.has_key("shares"):
+    if "price" in d and "shares" in d:
         return d["price"] * d["shares"]
     else:
         return None
 
 def genPrice(d):
-    if d.has_key("shares") and d.has_key("mc"):
+    if "shares" in d and "mc" in d:
         return d["mc"] / d["shares"]
-    elif d.has_key("pe") and d.has_key("eps"):
+    elif "pe" in d and "eps" in d:
         return d["pe"] * d["eps"]
     else:
         return None
@@ -294,7 +294,7 @@ def genShares(d):
     return None
 
 def genMargins(d):
-    if d.has_key("income") and d.has_key("revenue"):
+    if "income" in d and "revenue" in d:
         i=d["income"]
         r=d["revenue"]
         if i<0.0 or r<0.0:
@@ -305,13 +305,13 @@ def genDiv(d):
     return None
 
 def genYield(d):
-    if d.has_key("price") and d.has_key("dividend"):
+    if "price" in d and "dividend" in d:
         return pcnt2str( d["dividend"] / d["price"] )
     else:
         return None
 
 def genPayout(d):
-    if d.has_key("eps") and d.has_key("dividend") and d["eps"]>0.0:
+    if "eps" in d and "dividend" in d and d["eps"]>0.0:
         return pcnt2str( d["dividend"] / d["eps"] )
     else:
         return None
