@@ -1,2 +1,2 @@
-#!/bin/sh
-../../stocknotes/html_index bydate
+#!/bin/bash
+../../stocknotes/html_index bydate 2> /home/kleemann/error/html_bydate.err

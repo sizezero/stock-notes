@@ -107,7 +107,7 @@ def processFile(fileName, ticker):
     currentText = ""
     mult=lib.fraction.one
     balance=lib.shares.zero
-    input = open(fileName,'r')
+    input = open(fileName,'r',encoding='utf-8')
     lineNo = 0
     succeed = 1
     while 1:

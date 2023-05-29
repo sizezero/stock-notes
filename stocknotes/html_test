@@ -5,7 +5,7 @@ import html
 import string
 import sys
 
-#import lib.stocks as stocks
+import lib.stocks as stocks
 
 def main():
     print("Content-type: text/html\n")
