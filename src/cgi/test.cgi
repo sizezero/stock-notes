@@ -1,2 +1,3 @@
 #!/bin/sh
-../../stocknotes/html_buysell
+# ( cd ../.. && stocknotes/html_test )
+../../stocknotes/html_test
