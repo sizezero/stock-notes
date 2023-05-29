@@ -30,7 +30,7 @@ def disp1(ticker):
     
 def disp2(ticker):
     fileName = "%s/%s.txt" % (LOG_DIR,ticker)
-    input = open(fileName,'r')
+    input = open(fileName,'r',encoding='utf-8')
     lineNo = 0
     print("Ticker: "+string.upper(ticker)+"<br><br>")
     while 1:
