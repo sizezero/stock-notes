@@ -1,6 +1,7 @@
 #!/usr/bin/python3 -Wignore
 
 import cgi
+import html
 import re
 import os
 import string
@@ -13,10 +14,12 @@ def main():
     #print("Content-type: text/plain\n")
     print("Content-type: text/html\n")
     form = cgi.FieldStorage()
+    #form = { "ticker" : "amd"  }
     if not "ticker" in form:
         print("need ticker argument")
         return
     ticker = str(form["ticker"].value)
+    #ticker = form["ticker"]
     if not reTicker.search(ticker):
         print("invalid ticker: "+ticker)
         return
@@ -32,7 +35,7 @@ def disp2(ticker):
     fileName = "%s/%s.txt" % (LOG_DIR,ticker)
     input = open(fileName,'r',encoding='utf-8')
     lineNo = 0
-    print("Ticker: "+string.upper(ticker)+"<br><br>")
+    print("Ticker: "+ticker.upper()+"<br><br>")
     while 1:
         line = input.readline()
         lineNo = lineNo + 1
