@@ -1,2 +1,2 @@
 #!/bin/bash
-../../stocknotes/html_buysell &> /home/kleemann/error/html_test.err
+../../stocknotes/html_buysell 2> /home/kleemann/error/html_buysell.err
