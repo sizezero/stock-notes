@@ -1,0 +1,7 @@
+#!/usr/bin/python3 -Wignore
+
+def main():
+    print("Content-type: text/html\n")
+    print("Hello World!")
+
+main()
