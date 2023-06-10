@@ -194,9 +194,9 @@ def getArgs():
         tickers=list(stocks.companies.keys())
         tickers.sort()
     else:
-        tickers=map(string.upper,a)
+        tickers=list(map(lambda x: x.upper(),a))
         for t in tickers:
-            if not t in stocks:
+            if not t in stocks.companies:
                 print("unknown ticker "+t)
                 sys.exit(1)
                 
