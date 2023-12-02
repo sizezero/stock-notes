@@ -59,6 +59,24 @@ class Date:
                 return self.day < other.day
         return False
 
+    def __ge__(self,other):
+        if self.year < other.year:
+            return False
+        elif self.year > other.year:
+            return True
+        else: # years are equal
+            if self.month < other.month:
+                return False
+            elif self.month > other.month:
+                return True
+            else: # years and months are equal
+                if self.day < other.day:
+                    return False
+                elif self.day >= other.day:
+                    return True
+
+        raise Exception("we should never get here")
+
     def __eq__(self,other):
         return self.year==other.year and self.month==other.month and self.day==other.day
 
