@@ -36,7 +36,8 @@ def main():
             if c.buy or c.sell:
                 tickers.append(c.ticker)
 
-    downloadAlphaVantageCsv(tickers,target_fname)
+    #downloadAlphaVantageCsv(tickers,target_fname)
+    downloadFinnhubCsv(tickers,target_fname)
 
 def getArgs():
     if len(sys.argv)==1:
@@ -57,8 +58,8 @@ def downloadYahooCsv(tickers,target_fname):
 dateRe = re.compile(r"^(?P<year>\d+)/(?P<month>\d+)/(?P<day>\d+)$")
 
 # parser expects rows of
-# symbole,price,date
-# where date is MM/DD/YYY
+# symbol,price,date
+# where date is MM/DD/YYYY
 # TODO: the date is historical and we could refactor this and reader code to use a sensible format
 def downloadAlphaVantageCsv(tickers,target_fname):
     f = open(target_fname,"w")
@@ -76,6 +77,7 @@ def alphaVantageQuote(ticker):
     if "Error Message" in j:
         return ("0.00","1970/01/01",j["Error Message"]+" "+j["url"])
     if not ("Time Series (Daily)" in j):
+        print(j)
         return ("0.00","1970/01/01","Bad JSON")
     times = list(j["Time Series (Daily)"].keys())
     times.sort()
@@ -123,6 +125,32 @@ def alphaVantageGet(ticker):
     ret = r.json()
     ret["url"] = r.url
     return ret
+
+# parser expects rows of
+# symbol,price,date
+# where date is MM/DD/YYYY
+# TODO: the date is historical and we could refactor this and reader code to use a sensible format
+def downloadFinnhubCsv(tickers,target_fname):
+    m=time.localtime(time.time())
+    today= "%02d/%02d/%04d" % (m[1],m[2],m[0])
+    f = open(target_fname,"w")
+    for ticker in tickers:
+        (quote, error) = finnhubQuote(ticker)
+        f.write(ticker+","+quote+","+today+","+error+"\n")
+        time.sleep(2)
+    f.close()
+
+# returns the latest (quote,error) for the given ticker
+def finnhubQuote(ticker):
+    payload = {
+        'symbol': ticker,
+        'token': configuration.FINNHUB_ACCESS_KEY }
+    r = requests.get('https://finnhub.io/api/v1/quote', params=payload)
+    if r.status_code == 200:
+        ret = r.json()
+        return (str(ret['c']), '')
+    else:
+        return ('0', 'status code '+str(r.status_code))
 
 def doCmd(cmd,fail):
     input = os.popen(cmd)

@@ -7,3 +7,4 @@ BUY_SELL_QUOTES_FILE = "%s/download/quotes_buysell.csv" % _shared
 TEMP_FILE = "%s/download/temp" % _shared
 NO_CIK_URL = "file://%s/src/res/nocik.html" % _project
 ALPHA_VANTAGE_ACCESS_KEY="*******"
+FINNHUB_ACCESS_KEY="*******"
