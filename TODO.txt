@@ -1,0 +1,96 @@
+
+
+barbara_owned DONE
+browse_oldest DONE
+clipcalc 
+next_research DONE
+owned DONE
+
+src/cgi/log.cgi : calls html_log which requires a ticker argument, not sure if this ever worked
+src/cgi/cgitest.cgi : can't possibly work; removing
+src/cgi/bydate.cgi DONE
+src/cgi/buysell.cgi : runs, no way to test reverse; form has it but not sure how it is invoked; TEST WHEN ON THE WEBPAGE
+src/cgi/byticker.cgi DONE
+src/www/index.html : TEST ON WEBPAGE
+
+./stocknotes/gain DONE
+./stocknotes/bydate DONE
+./stocknotes/check_notify DONE it ran, but I don't think I have any notifies
+./stocknotes/download_quotes DONE
+./stocknotes/oldest DONE
+./stocknotes/report DONE comment says it's useless so removing
+./stocknotes/tests DONE
+./stocknotes/tests/date_test.py DONE
+./stocknotes/tests/context.py DONE
+./stocknotes/tests/stocks_test.py DONE
+./stocknotes/html_buysell DONE can't test cgi form args
+./stocknotes/browse_ticker DONE checked with command line app
+./stocknotes/html_log TEST ON WEBPAGE
+./stocknotes/tradetest DONE removed
+./stocknotes/calc DONE
+./stocknotes/html_index DONE
+./stocknotes/keywords DONE
+
+I'm not really testing lib files. More unit tests would be good.
+
+./stocknotes/lib
+./stocknotes/lib/__init__.py
+./stocknotes/lib/cash.py
+./stocknotes/lib/stocks.py
+./stocknotes/lib/buysell.py
+./stocknotes/lib/quotes.py
+./stocknotes/lib/configuration.py.example
+./stocknotes/lib/fraction.py
+./stocknotes/lib/configuration.py
+./stocknotes/lib/notify.py
+./stocknotes/lib/trade.py
+./stocknotes/lib/date.py
+./stocknotes/lib/shares.py
+./stocknotes/lib/price.py
+
+
+deprecate "import cgi" and replace with "import html"
+
+temporarily added 'python3 -Wignore' to html_* scripts
+
+Ok, something is going wrong on the server side. I can run the scripts
+successfully from the shell but the cgi fails with an unhelpful server
+error. I've made some progress by having a tiny script that succeeds
+and adding an import which casues a failure but it still sucks because
+I can't see the message. Here are some things to try:
+
+- Setup a python version 2 and a python version 3 checkout. Make sure
+  that each one honors the symlinks that are checked into the git
+  projects. Point them each to a separate set of data. I should be
+  able to run the v2 with no problem and the v3 from a different
+  URL. That may not work fully as the generated v3 html might point
+  back to the v2 urls.
+
+- See if the stderr from the cgi script can be redirected to a file on
+  the server.
+
+- Start with the simplest cgi script copied into the test script with
+  most everything commented out. Uncomment lines in small chunks and
+  test.
+
+It seems to work now. The last task is to rename the old default
+symlinks to python2 and the python3 to default. I think I'll wait a
+bit before merging the branch in to master.
+
+2023-12-01
+
+My old quote generator has been broken for a while. Make a new quote
+generator via finnhub.io, try to make it modular, and add some tests
+for it.
+
+wget 'https://finnhub.io/api/v1/quote?token=clla5f1r01qhqdq2te7gclla5f1r01qhqdq2te80&symbol=AAPL'
+
+I just noticed that the current home branch is "python3" while
+dreamhost is still on main. I'd like to eventually get the remote site
+on python3 but, as long as I don't change the data format, it's not
+urgent. I may have to change it if I want the remote to be able to
+download stock quotes.
+
+I've got it working. The dreamhost setup is using python3 to download
+the quotes but using the main python2 branch to do the rendering. I'll
+eventually need to update that.
